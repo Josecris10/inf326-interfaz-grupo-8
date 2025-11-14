@@ -9,17 +9,20 @@ import {
 	Stack,
 	Text,
 } from "@chakra-ui/react";
-import { Link as RouterLink } from "react-router-dom";
+import { Link as RouterLink, useNavigate } from "react-router-dom";
 import AuthLayout from "../components/auth/AuthLayout";
 
 export default function LoginPage() {
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 
+	const navigate = useNavigate();
+
 	const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		// TODO: llamada a tu API de login
 		console.log({ email, password });
+		navigate("/home");
 	};
 
 	return (
