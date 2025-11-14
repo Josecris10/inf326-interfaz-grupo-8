@@ -1,0 +1,36 @@
+scalar DateTime
+
+schema {
+    query: Query
+    mutation: Mutation
+}
+
+type Message {
+    id: ID!
+    thread: Thread!
+    user_id: User!
+    type: String
+    paths: [String]
+    created_at: DateTime!
+    updated_at: DateTime!
+    deleted_at: DateTime
+}
+
+type Thread {
+    id: ID!
+    name: String!
+    country: String!
+    description: String
+    players: [Player]
+}
+
+type Query {
+    listPlayers(team_id: ID): [Player]!
+    listTeams: [Team]!
+    getPlayer(id: ID!): Player!
+    getTeam(id: ID!): Team!
+}
+
+type Mutation {
+    createTeam(name: String!, country: String!, description: String): Team!
+}
