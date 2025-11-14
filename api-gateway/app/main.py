@@ -91,6 +91,17 @@ base_message_service_url = "http://messages-service.nursoft.dev"
 
 #     return requests.post(f"http://demo_04_service_02/teams", json=payload).json()
 
+@query.field("getPlayer")
+def resolve_get_message(obj, resolve_info: GraphQLResolveInfo, thread_id, user_id):
+    headers = {
+        "X-User-Id": str(user_id)
+    }
+
+    response = requests.get(base_message_service_url+f"/threads/{thread_id}/messages", headers=headers)
+
+    if response.status_code == 200:
+        return response.json()
+
 @mutation.field("createMessage")
 def resolve_create_message(obj, resolve_info: GraphQLResolveInfo, thread_id, content, type_, paths, user_id):
     headers = {
@@ -101,7 +112,10 @@ def resolve_create_message(obj, resolve_info: GraphQLResolveInfo, thread_id, con
                     type=type_,
                     paths=paths)
 
-    return requests.post(base_message_service_url+f"/threads/{thread_id}/messages", json=payload, headers=headers).json()
+    response = requests.post(base_message_service_url+f"/threads/{thread_id}/messages", json=payload, headers=headers)
+
+    if response.status_code == 200:
+        return response.json()
 
 @mutation.field("updateMessage")
 def resolve_update_message(obj, resolve_info: GraphQLResolveInfo, thread_id, message_id, content, type_, paths, user_id):
@@ -113,7 +127,10 @@ def resolve_update_message(obj, resolve_info: GraphQLResolveInfo, thread_id, mes
                     type=type_,
                     paths=paths)
 
-    return requests.put(base_message_service_url+f"/threads/{thread_id}/messages/{message_id}", json=payload, headers=headers).json()
+    response = requests.put(base_message_service_url+f"/threads/{thread_id}/messages/{message_id}", json=payload, headers=headers)
+
+    if response.status_code == 200:
+        return response.json()
 
 @mutation.field("deleteMessage")
 def resolve_delete_message(obj, resolve_info: GraphQLResolveInfo, thread_id, message_id, user_id):
@@ -121,7 +138,10 @@ def resolve_delete_message(obj, resolve_info: GraphQLResolveInfo, thread_id, mes
         "X-User-Id": str(user_id)
     }
     
-    return requests.delete(base_message_service_url+f"/threads/{thread_id}/messages/{message_id}", headers=headers).json()
+    response = requests.delete(base_message_service_url+f"/threads/{thread_id}/messages/{message_id}", headers=headers)
+
+    if response.status_code == 200:
+        return response.json()
 
 schema = make_executable_schema(type_defs, query, mutation, message)
 app = CORSMiddleware(GraphQL(schema, debug=True), allow_origins=['*'], allow_methods=("GET", "POST", "PUT", "DELETE", "OPTIONS"))
