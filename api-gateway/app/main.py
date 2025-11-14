@@ -91,7 +91,7 @@ base_message_service_url = "http://messages-service.nursoft.dev"
 
 #     return requests.post(f"http://demo_04_service_02/teams", json=payload).json()
 
-@query.field("getPlayer")
+@query.field("getMessage")
 def resolve_get_message(obj, resolve_info: GraphQLResolveInfo, thread_id, user_id):
     headers = {
         "X-User-Id": str(user_id)
