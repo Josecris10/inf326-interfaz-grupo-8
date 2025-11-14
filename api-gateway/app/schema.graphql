@@ -1,28 +1,28 @@
+scalar DateTime
 
 schema {
     query: Query
     mutation: Mutation
 }
 
-type Player {
+type Message {
     id: ID!
-    name: String!
-    age: Int!
-    number: Int!
-    description: String
-    avatar_url: String
-    team: Team
+    thread: Thread!
+    user_id: User!
+    type: String
+    paths: [String]
+    created_at: DateTime!
+    updated_at: DateTime!
+    deleted_at: DateTime
 }
 
-type Team {
+type Thread {
     id: ID!
     name: String!
     country: String!
     description: String
     players: [Player]
 }
-
-
 
 type Query {
     listPlayers(team_id: ID): [Player]!
