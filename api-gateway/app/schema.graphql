@@ -58,18 +58,18 @@ type Channel {
 
 
 type Query {
-    getMessage(thread_id: ID!, user_id: ID!): MessagesPage!
+    getMessage(thread_id: String!, user_id: String!): MessagesPage!
 
-
+    getChannel(channel_id: String!): Channel!
 }
 
 type Mutation {
-    createMessage(thread_id: ID!, content: String!, type_: String!, paths: [String], user_id: ID!): Message!
-    updateMessage(thread_id: ID!, message_id: ID!, content: String!, type_: String!, paths: [String], user_id: ID!): Message!
-    deleteMessage(thread_id: ID!, message_id: ID!, user_id: ID!): Boolean!
+    createMessage(thread_id: ID!, content: String!, type_: String!, paths: [String], user_id: String!): Message!
+    updateMessage(thread_id: String!, message_id: String!, content: String!, type_: String!, paths: [String], user_id: String!): Message!
+    deleteMessage(thread_id: String!, message_id: String!, user_id: String!): Boolean!
 
-    createChannel(thread_id: ID!, content: String!, type_: String!, paths: [String], user_id: ID!): Channel!
-    updateChannel(thread_id: ID!, message_id: ID!, content: String!, type_: String!, paths: [String], user_id: ID!): Channel!
-    deleteChannel(thread_id: ID!, message_id: ID!, user_id: ID!): Channel!
-    reactivateChannel(thread_id: ID!, message_id: ID!, user_id: ID!): Boolean!
+    createChannel(name: String!, owner_id: String!, users: [ChannelMember!]!, channel_type: ChannelType!): Channel!
+    updateChannel(channel_id: ID!, name: String!, owner_id: String!, channel_type: ChannelType!): Channel!
+    deleteChannel(channel_id: ID!): Channel!
+    reactivateChannel(channel_id: ID!): Boolean!
 }

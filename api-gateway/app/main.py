@@ -117,7 +117,7 @@ def resolve_create_channel(obj, resolve_info: GraphQLResolveInfo, name, owner_id
         return response.json()
 
 @mutation.field("updateChannel")
-def resolve_update_message(obj, resolve_info: GraphQLResolveInfo, channel_id, name, owner_id, channel_type):
+def resolve_update_channel(obj, resolve_info: GraphQLResolveInfo, channel_id, name, owner_id, channel_type):
     payload = dict(name=name,
                     owner_id=owner_id,
                     channel_type=channel_type)
@@ -128,14 +128,14 @@ def resolve_update_message(obj, resolve_info: GraphQLResolveInfo, channel_id, na
         return response.json()
 
 @mutation.field("reactivateChannel")
-def resolve_update_message(obj, resolve_info: GraphQLResolveInfo, channel_id):
+def resolve_reactivate_channel(obj, resolve_info: GraphQLResolveInfo, channel_id):
     response = requests.post(base_channel_service_url+f"/{channel_id}/reactivate")
 
     if response.status_code == 200:
         return response.json()
 
-@mutation.field("deleteMessage")
-def resolve_delete_message(obj, resolve_info: GraphQLResolveInfo, channel_id):
+@mutation.field("deleteChannel")
+def resolve_delete_channel(obj, resolve_info: GraphQLResolveInfo, channel_id):
     
     response = requests.delete(base_channel_service_url+f"/{channel_id}")
 
