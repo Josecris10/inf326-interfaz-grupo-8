@@ -54,6 +54,18 @@ type Channel {
 
 
 
+type User {
+  id: ID!
+  email: String!
+  username: String!
+  full_name: String
+  is_active: Boolean!
+}
+
+type Token {
+  access_token: String!
+  token_type: String!
+}
 
 
 
@@ -61,6 +73,8 @@ type Query {
     getMessage(thread_id: String!, user_id: String!): MessagesPage!
 
     getChannel(channel_id: String!): Channel!
+
+    getUser(token: String!): User!
 }
 
 type Mutation {
@@ -72,4 +86,8 @@ type Mutation {
     updateChannel(channel_id: ID!, name: String!, owner_id: String!, channel_type: ChannelType!): Channel!
     deleteChannel(channel_id: ID!): ID!
     reactivateChannel(channel_id: ID!): ID!
+
+    createUser(email: String!, username: String!, password: String!, full_name: String): User!
+    updateUser(full_name: String): User!
+    loginUser(username_or_email: String!, password: String!): Token!
 }
