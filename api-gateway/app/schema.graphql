@@ -70,6 +70,6 @@ type Mutation {
 
     createChannel(name: String!, owner_id: String!, users: [ChannelMember!]!, channel_type: ChannelType!): Channel!
     updateChannel(channel_id: ID!, name: String!, owner_id: String!, channel_type: ChannelType!): Channel!
-    deleteChannel(channel_id: ID!): Channel!
-    reactivateChannel(channel_id: ID!): Boolean!
+    deleteChannel(channel_id: ID!): ID!
+    reactivateChannel(channel_id: ID!): ID!
 }
