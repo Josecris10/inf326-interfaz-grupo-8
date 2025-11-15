@@ -97,9 +97,16 @@ export default function ChannelPage() {
 						</Stack>
 
 						<Button
+							aria-label="Buscar"
 							variant="outline"
+							p={2}
+							bg="#004B85"
+							color="#fff"
+							_hover={{
+								bg: "#fff",
+								color: "#004B85",
+							}}
 							onClick={() => navigate("/home")}
-							color={"#fff"}
 						>
 							Volver
 						</Button>
@@ -253,7 +260,6 @@ export default function ChannelPage() {
 									value={tSearch}
 									onChange={(e) => setTSearch(e.target.value)}
 									bg="bg.subtle"
-									onClick={() => handleTSearch()}
 								/>
 								<Button
 									aria-label="Buscar"
@@ -265,6 +271,7 @@ export default function ChannelPage() {
 										bg: "#fff",
 										color: "#004B85",
 									}}
+									onClick={() => handleTSearch()}
 								>
 									<FiSearch />
 								</Button>

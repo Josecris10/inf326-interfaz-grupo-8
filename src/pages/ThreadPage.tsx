@@ -1,4 +1,4 @@
-import { useMemo, useState, useRef } from "react";
+import { useState, useRef, useMemo } from "react";
 import {
 	Box,
 	Button,
@@ -19,8 +19,8 @@ import { FiSearch } from "react-icons/fi";
 import { IoText } from "react-icons/io5";
 
 import { MOCK_MESSAGES } from "../data/mock_messages";
-import type { Thread } from "../types/thread";
 import type { Channel } from "../types/channel";
+import type { Thread } from "../types/thread";
 
 export default function ThreadPage() {
 	const [search, setSearch] = useState("");
@@ -33,23 +33,31 @@ export default function ThreadPage() {
 	const thread = location.state.thread;
 	const channel = location.state.channel;
 
+	const replyFormRef = useRef<HTMLDivElement | null>(null);
+
 	const threadMessages = useMemo(
-		() =>
-			MOCK_MESSAGES.filter((m) => Number(m.thread_id) === thread.id),
+		() => MOCK_MESSAGES.filter((m) => Number(m.thread_id) === thread.id),
 		[thread.id]
 	);
 
-	const replyFormRef = useRef<HTMLDivElement | null>(null);
+	const filteredMessages = useMemo(() => {
+		let result = threadMessages;
+
+		const q = search.trim().toLowerCase();
+		if (q) {
+			result = result.filter((m) =>
+				(m.content ?? "").toLowerCase().includes(q)
+			);
+		}
+
+		return result;
+	}, [threadMessages, search]);
 
 	const handleScrollToReply = () => {
 		replyFormRef.current?.scrollIntoView({
 			behavior: "smooth",
 			block: "start",
 		});
-	};
-
-	const handleSearch = () =>{
-		console.log(search);
 	};
 
 	const handleSendMessage = () => {
@@ -83,13 +91,20 @@ export default function ThreadPage() {
 						</Stack>
 
 						<Button
+							aria-label="Buscar"
 							variant="outline"
+							p={2}
+							bg="#004B85"
+							color="#fff"
+							_hover={{
+								bg: "#fff",
+								color: "#004B85",
+							}}
 							onClick={() =>
 								navigate(`/channels/${channel.id}`, {
 									state: { channel },
 								})
 							}
-							color="#fff"
 						>
 							Volver
 						</Button>
@@ -162,18 +177,13 @@ export default function ThreadPage() {
 							p={2}
 							bg="#004B85"
 							color="#fff"
-							_hover={{
-								bg: "#fff",
-								color: "#004B85",
-							}}
-							onClick={() => handleSearch()}
 						>
 							<FiSearch />
 						</Button>
 					</HStack>
 
 					{/* Lista de mensajes del hilo */}
-					{threadMessages.map((message) => (
+					{filteredMessages.map((message) => (
 						<Box
 							key={message.id}
 							w="85%"

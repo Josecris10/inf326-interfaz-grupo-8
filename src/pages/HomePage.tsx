@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
 	Badge,
 	Box,
@@ -19,24 +19,27 @@ import type { Channel } from "../types/channel";
 
 export default function HomePage() {
 	const [search, setSearch] = useState("");
-	const [filteredChannels, setFilteredChannels] = useState<Channel[]>(MOCK_CHANNELS);
 	const navigate = useNavigate();
+	
+	const channels = useMemo(() => MOCK_CHANNELS, []);
+
+	const filteredChannels = useMemo(() => {
+		let result = channels;
+
+		const q = search.trim().toLowerCase();
+		if (q) {
+			result = result.filter((c) =>
+				(c.name ?? "").toLowerCase().includes(q)
+			);
+		}
+
+		return result;
+	}, [channels, search]);
 
 	const handleChannelClick = (channel: Channel) => {
 		navigate(`/channels/${channel.id}`, {
 			state: { channel }
 		});
-	};
-
-	const handleSearch = () => {
-		const q = search.trim().toLowerCase();
-		if (!q) {
-			setFilteredChannels(MOCK_CHANNELS);
-			return;
-		}
-		setFilteredChannels(MOCK_CHANNELS.filter((ch) =>
-			ch.name.toLowerCase().includes(q)
-		));
 	};
 
 	return (
@@ -74,11 +77,6 @@ export default function HomePage() {
 						p={2}
 						bg="#004B85"
 						color="#fff"
-						_hover={{
-							bg: "#fff",
-							color: "#004B85",
-						}}
-						onClick={() => handleSearch()}
 					>
 						<FiSearch />
 					</Button>
@@ -94,6 +92,7 @@ export default function HomePage() {
 						bg: "#fff",
 						color: "#D60019",
 					}}
+					onClick={() => navigate("/login")}
 				>
 					<Text>
 						Cerrar Sesión
