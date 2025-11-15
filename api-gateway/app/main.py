@@ -30,6 +30,7 @@ logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s:%(levelname)s:%(name)s:%(message)s')
 
 base_channel_service_url = "http://channel-api-service:8000/v1/channels"
+base_user_service_url = "http://users-service:80"
 base_message_service_url = "http://messages-service.nursoft.dev"
 # @query.field("getPlayer")
 # def resolve_get_player(obj, resolve_info: GraphQLResolveInfo, id):
@@ -91,6 +92,54 @@ base_message_service_url = "http://messages-service.nursoft.dev"
 #         payload['description'] = description
 
 #     return requests.post(f"http://demo_04_service_02/teams", json=payload).json()
+
+@query.field("getUser")
+async def resolve_get_user(obj, resolve_info: GraphQLResolveInfo, token):
+    headers = {
+        "Authorization": "Bearer "+token
+    }
+
+    response = requests.get(base_user_service_url+"/users/me", headers=headers)
+    if response.status_code == 200:
+        return response.json()
+
+@mutation.field("createUser")
+def resolve_create_user(obj, resolve_info: GraphQLResolveInfo, email, username, password, full_name):
+    payload = dict(email=email,
+                    username=username,
+                    password=password)
+
+    if full_name:
+        payload['full_name'] = full_name
+
+    response = requests.post(base_user_service_url+"/users/register", json=payload)
+
+    if response.status_code == 201:
+        return response.json()
+
+@mutation.field("updateUser")
+def resolve_update_user(obj, resolve_info: GraphQLResolveInfo, full_name):
+    payload = dict()
+
+    if full_name:
+        payload['full_name'] = full_name
+
+    response = requests.patch(base_channel_service_url+"/users/me", json=payload)
+
+    if response.status_code == 200:
+        return response.json()
+
+@mutation.field("loginUser")
+def resolve_delete_user(obj, resolve_info: GraphQLResolveInfo, username_or_email, password):
+    payload = dict(username_or_email=username_or_email,
+                    password=password)
+
+    response = requests.post(base_channel_service_url+"/auth/login", json=payload)
+
+    if response.status_code == 201:
+        return response.json()
+
+
 
 
 
@@ -199,4 +248,4 @@ def resolve_delete_message(obj, resolve_info: GraphQLResolveInfo, thread_id, mes
         return True
 
 schema = make_executable_schema(type_defs, query, mutation, message)
-app = CORSMiddleware(GraphQL(schema, debug=True), allow_origins=['*'], allow_methods=("GET", "POST", "PUT", "DELETE", "OPTIONS"))
+app = CORSMiddleware(GraphQL(schema, debug=True), allow_origins=['*'], allow_methods=("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"))
