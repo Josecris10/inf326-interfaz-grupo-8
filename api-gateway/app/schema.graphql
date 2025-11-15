@@ -5,6 +5,9 @@ schema {
     mutation: Mutation
 }
 
+
+
+
 type Message {
     id: ID!
     thread: Thread!
@@ -16,13 +19,41 @@ type Message {
     deleted_at: DateTime
 }
 
-type Thread {
-    id: ID!
-    name: String!
-    country: String!
-    description: String
-    players: [Player]
+type MessagesPage {
+    items: [Messages!]!
+    next_cursor: String
+    has_more: Boolean!
 }
+
+
+
+enum ChannelType {
+    PUBLIC
+    PRIVATE
+}
+
+type ChannelMember {
+    id: ID!
+    joined_at: Float!
+}
+
+type Channel {
+    id: ID
+    name: String!
+    owner_id: String!
+    users: [ChannelMember!]!
+    threads: [String!]!
+    is_active: Boolean!
+    channel_type: ChannelType!
+    created_at: Float!
+    updated_at: Float!
+    deleted_at: Float
+}
+
+
+
+
+
 
 type Query {
     listPlayers(team_id: ID): [Player]!
@@ -32,5 +63,8 @@ type Query {
 }
 
 type Mutation {
-    createTeam(name: String!, country: String!, description: String): Team!
+    getMessage(thread_id: ID!, content: String!, type_: String!, paths: [String], user_id: ID!): MessagesPage!
+    createMessage(thread_id: ID!, content: String!, type_: String!, paths: [String], user_id: ID!): Message!
+    updateMessage(thread_id: ID!, message_id: ID!, content: String!, type_: String!, paths: [String], user_id: ID!): Message!
+    deleteMessage(thread_id: String!, message_id: String!, user_id: String): Team!
 }
