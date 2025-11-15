@@ -5,6 +5,11 @@ services:
       - "5000:80"
     volumes:
       - .:/code
+    environment:
+      - SEARCH_SERVICE_BASE=http://localhost:8088
+      - CHANNEL_SERVICE_BASE=http://localhost:8082/v1/channels
+      - MESSAGE_SERVICE_BASE=http://localhost:8084
+    network_mode: "host"
 
 networks:
   default:
