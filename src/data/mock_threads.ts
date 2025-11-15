@@ -1,4 +1,4 @@
-import type { Thread } from "@/types/threads";
+import type { Thread } from "@/types/thread";
 
 export const MOCK_THREADS: Thread[] = [
 	{

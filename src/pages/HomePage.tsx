@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import {
 	Badge,
 	Box,
@@ -19,20 +19,24 @@ import type { Channel } from "../types/channel";
 
 export default function HomePage() {
 	const [search, setSearch] = useState("");
+	const [filteredChannels, setFilteredChannels] = useState<Channel[]>(MOCK_CHANNELS);
 	const navigate = useNavigate();
-
-	const filteredChannels = useMemo(() => {
-		const q = search.trim().toLowerCase();
-		if (!q) return MOCK_CHANNELS;
-		return MOCK_CHANNELS.filter((ch) =>
-			ch.name.toLowerCase().includes(q)
-		);
-	}, [search]);
 
 	const handleChannelClick = (channel: Channel) => {
 		navigate(`/channels/${channel.id}`, {
 			state: { channel }
 		});
+	};
+
+	const handleSearch = () => {
+		const q = search.trim().toLowerCase();
+		if (!q) {
+			setFilteredChannels(MOCK_CHANNELS);
+			return;
+		}
+		setFilteredChannels(MOCK_CHANNELS.filter((ch) =>
+			ch.name.toLowerCase().includes(q)
+		));
 	};
 
 	return (
@@ -52,7 +56,7 @@ export default function HomePage() {
 				zIndex={10}
 			>
 				<HStack gap={2}>
-					<Heading size="2xl" color={"#fff"}>
+					<Heading size="4xl" color={"#fff"}>
 						INF326 Community
 					</Heading>
 				</HStack>
@@ -74,6 +78,7 @@ export default function HomePage() {
 							bg: "#fff",
 							color: "#004B85",
 						}}
+						onClick={() => handleSearch()}
 					>
 						<FiSearch />
 					</Button>
@@ -100,7 +105,7 @@ export default function HomePage() {
 			<Container maxW="4xl" py={8}>
                 {/* Lista tipo Reddit */}
 				<Stack gap={4}>
-					{filteredChannels.length === 0 && (
+					{filteredChannels?.length === 0 && (
 						<Box
 							bg="bg.surface"
 							borderRadius="lg"

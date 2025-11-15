@@ -3,6 +3,7 @@ import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import HomePage from "./pages/HomePage";
 import ChannelPage from "./pages/ChannelPage";
+import ThreadPage from "./pages/ThreadPage";
 
 function App() {
 	return (
@@ -11,6 +12,7 @@ function App() {
 			<Route path="/register" element={<RegisterPage />} />
 			<Route path="/home" element={<HomePage />} />
 			<Route path="/channels/:id" element={<ChannelPage />} />
+			<Route path="/threads/:id" element={<ThreadPage />} />
 			<Route path="*" element={<Navigate to="/login" replace />} />
 		</Routes>
 	);
