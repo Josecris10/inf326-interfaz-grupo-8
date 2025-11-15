@@ -20,10 +20,12 @@ type Message {
 }
 
 type MessagesPage {
-    items: [Messages!]!
+    items: [Message!]!
     next_cursor: String
     has_more: Boolean!
 }
+
+
 
 
 
@@ -56,15 +58,12 @@ type Channel {
 
 
 type Query {
-    listPlayers(team_id: ID): [Player]!
-    listTeams: [Team]!
-    getPlayer(id: ID!): Player!
-    getTeam(id: ID!): Team!
+    
+    getMessage(thread_id: ID!, user_id: ID!): MessagesPage!
 }
 
 type Mutation {
-    getMessage(thread_id: ID!, content: String!, type_: String!, paths: [String], user_id: ID!): MessagesPage!
     createMessage(thread_id: ID!, content: String!, type_: String!, paths: [String], user_id: ID!): Message!
     updateMessage(thread_id: ID!, message_id: ID!, content: String!, type_: String!, paths: [String], user_id: ID!): Message!
-    deleteMessage(thread_id: String!, message_id: String!, user_id: String): Team!
+    deleteMessage(thread_id: ID!, message_id: ID!, user_id: ID!): Team!
 }
