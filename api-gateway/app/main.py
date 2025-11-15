@@ -196,7 +196,7 @@ def resolve_delete_message(obj, resolve_info: GraphQLResolveInfo, thread_id, mes
     response = requests.delete(base_message_service_url+f"/threads/{thread_id}/messages/{message_id}", headers=headers)
 
     if response.status_code == 200:
-        return response.json()
+        return True
 
 schema = make_executable_schema(type_defs, query, mutation, message)
 app = CORSMiddleware(GraphQL(schema, debug=True), allow_origins=['*'], allow_methods=("GET", "POST", "PUT", "DELETE", "OPTIONS"))

@@ -58,12 +58,18 @@ type Channel {
 
 
 type Query {
-    
     getMessage(thread_id: ID!, user_id: ID!): MessagesPage!
+
+
 }
 
 type Mutation {
     createMessage(thread_id: ID!, content: String!, type_: String!, paths: [String], user_id: ID!): Message!
     updateMessage(thread_id: ID!, message_id: ID!, content: String!, type_: String!, paths: [String], user_id: ID!): Message!
-    deleteMessage(thread_id: ID!, message_id: ID!, user_id: ID!): Team!
+    deleteMessage(thread_id: ID!, message_id: ID!, user_id: ID!): Boolean!
+
+    createChannel(thread_id: ID!, content: String!, type_: String!, paths: [String], user_id: ID!): Channel!
+    updateChannel(thread_id: ID!, message_id: ID!, content: String!, type_: String!, paths: [String], user_id: ID!): Channel!
+    deleteChannel(thread_id: ID!, message_id: ID!, user_id: ID!): Channel!
+    reactivateChannel(thread_id: ID!, message_id: ID!, user_id: ID!): Boolean!
 }
