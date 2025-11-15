@@ -1,4 +1,3 @@
-// src/pages/LoginPage.tsx
 import { useState } from "react";
 import type { FormEvent } from "react";
 import {
@@ -11,6 +10,8 @@ import {
 } from "@chakra-ui/react";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 import AuthLayout from "../components/auth/AuthLayout";
+import { loginUser } from "@/services/users_service";
+import { setAuthToken } from "@/services/storage";
 
 export default function LoginPage() {
 	const [email, setEmail] = useState("");
@@ -18,11 +19,19 @@ export default function LoginPage() {
 
 	const navigate = useNavigate();
 
-	const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+	const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-		// TODO: llamada a tu API de login
-		console.log({ email, password });
-		navigate("/home");
+		try {
+			const tokenRes = await loginUser({
+				username_or_email: email,
+				password
+			})
+			setAuthToken(tokenRes.access_token)
+			navigate("/home");
+		} catch (error) {
+			console.log(error);
+			navigate("/home");
+		}
 	};
 
 	return (
