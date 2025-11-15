@@ -106,7 +106,9 @@ export default function ThreadPage() {
 								})
 							}
 						>
-							Volver
+							<Text fontSize={"lg"}>
+								Volver
+							</Text>
 						</Button>
 					</Flex>
 				</Container>

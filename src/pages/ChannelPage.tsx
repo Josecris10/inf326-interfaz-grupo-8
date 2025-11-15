@@ -108,7 +108,9 @@ export default function ChannelPage() {
 							}}
 							onClick={() => navigate("/home")}
 						>
-							Volver
+							<Text fontSize={"lg"}>
+								Volver
+							</Text>
 						</Button>
 					</Flex>
 				</Container>

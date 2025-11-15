@@ -13,6 +13,11 @@ import {
 } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import { FiSearch } from "react-icons/fi";
+import { FaBook } from "react-icons/fa";
+import { FaCalculator } from "react-icons/fa";
+import { FaLaptopCode } from "react-icons/fa";
+import { FaTools } from "react-icons/fa";
+import { FaWikipediaW } from "react-icons/fa";
 
 import { MOCK_CHANNELS } from "../data/mock_channels";
 import type { Channel } from "../types/channel";
@@ -82,6 +87,59 @@ export default function HomePage() {
 					</Button>
 				</HStack>
 
+				<HStack maxW="sm" flex="1" ml={8} gap={2}>
+					<Button
+						aria-label="Academico"
+						variant="outline"
+						p={2}
+						bg="#004B85"
+						color="#fff"
+						onClick={() => navigate("/academic")}
+					>
+						<FaBook />
+					</Button>
+					<Button
+						aria-label="Calculadora"
+						variant="outline"
+						p={2}
+						bg="#004B85"
+						color="#fff"
+						onClick={() => navigate("/calculator")}
+					>
+						<FaCalculator />
+					</Button>
+					<Button
+						aria-label="Programacion"
+						variant="outline"
+						p={2}
+						bg="#004B85"
+						color="#fff"
+						onClick={() => navigate("/programation")}
+					>
+						<FaLaptopCode />
+					</Button>
+					<Button
+						aria-label="Utilidad"
+						variant="outline"
+						p={2}
+						bg="#004B85"
+						color="#fff"
+						onClick={() => navigate("/utility")}
+					>
+						<FaTools />
+					</Button>
+					<Button
+						aria-label="Wikipedia"
+						variant="outline"
+						p={2}
+						bg="#004B85"
+						color="#fff"
+						onClick={() => navigate("/wikipedia")}
+					>
+						<FaWikipediaW />
+					</Button>
+				</HStack>
+
 				<Button
 					aria-label="Cerrar Sesión"
 					variant="outline"
@@ -94,7 +152,7 @@ export default function HomePage() {
 					}}
 					onClick={() => navigate("/login")}
 				>
-					<Text>
+					<Text fontSize={"lg"}>
 						Cerrar Sesión
 					</Text>
 				</Button>
