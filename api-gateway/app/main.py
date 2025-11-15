@@ -94,7 +94,15 @@ base_message_service_url = "http://messages-service.nursoft.dev"
 
 
 
+@query.field("getChannel")
+async def resolve_get_channel(obj, resolve_info: GraphQLResolveInfo, channel_id):
+    # return await channel_loader.load(channel_id)
 
+    # Without dataloader this code will make n+1 requests:
+
+    response = requests.get(base_channel_service_url+f"/{channel_id}")
+    if response.status_code == 200:
+        return response.json()
 
 @mutation.field("createChannel")
 def resolve_create_channel(obj, resolve_info: GraphQLResolveInfo, name, owner_id, users, channel_type):
