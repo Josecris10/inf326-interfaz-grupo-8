@@ -43,7 +43,7 @@ type ThreadsByKeywordData = {
 };
 
 // ===================================================================
-//  Queries GraphQL (STRINGS) – AJUSTA NOMBRES Y CAMPOS A TU SCHEMA
+//  Queries GraphQL (STRINGS)
 // ===================================================================
 
 const SEARCH_MESSAGES_QUERY = /* GraphQL */ `
