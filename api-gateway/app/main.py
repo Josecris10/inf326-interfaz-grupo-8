@@ -29,6 +29,7 @@ message = ObjectType("Message")
 logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s:%(levelname)s:%(name)s:%(message)s')
 
+base_channel_service_url = "http://channel-api-service:8000/v1/channels"
 base_message_service_url = "http://messages-service.nursoft.dev"
 # @query.field("getPlayer")
 # def resolve_get_player(obj, resolve_info: GraphQLResolveInfo, id):
@@ -91,6 +92,60 @@ base_message_service_url = "http://messages-service.nursoft.dev"
 
 #     return requests.post(f"http://demo_04_service_02/teams", json=payload).json()
 
+
+
+@query.field("getChannel")
+async def resolve_get_channel(obj, resolve_info: GraphQLResolveInfo, channel_id):
+    # return await channel_loader.load(channel_id)
+
+    # Without dataloader this code will make n+1 requests:
+
+    response = requests.get(base_channel_service_url+f"/{channel_id}")
+    if response.status_code == 200:
+        return response.json()
+
+@mutation.field("createChannel")
+def resolve_create_channel(obj, resolve_info: GraphQLResolveInfo, name, owner_id, users, channel_type):
+    payload = dict(name=name,
+                    owner_id=owner_id,
+                    users=users,
+                    channel_type=channel_type)
+
+    response = requests.post(base_channel_service_url, json=payload)
+
+    if response.status_code == 201:
+        return response.json()
+
+@mutation.field("updateChannel")
+def resolve_update_channel(obj, resolve_info: GraphQLResolveInfo, channel_id, name, owner_id, channel_type):
+    payload = dict(name=name,
+                    owner_id=owner_id,
+                    channel_type=channel_type)
+
+    response = requests.put(base_channel_service_url+f"/{channel_id}", json=payload)
+
+    if response.status_code == 200:
+        return response.json()
+
+@mutation.field("reactivateChannel")
+def resolve_reactivate_channel(obj, resolve_info: GraphQLResolveInfo, channel_id):
+    response = requests.post(base_channel_service_url+f"/{channel_id}/reactivate")
+
+    if response.status_code == 200:
+        return response.json()
+
+@mutation.field("deleteChannel")
+def resolve_delete_channel(obj, resolve_info: GraphQLResolveInfo, channel_id):
+    
+    response = requests.delete(base_channel_service_url+f"/{channel_id}")
+
+    if response.status_code == 200:
+        return response.json()
+
+
+
+
+
 @query.field("getMessage")
 def resolve_get_message(obj, resolve_info: GraphQLResolveInfo, thread_id, user_id):
     headers = {
@@ -141,7 +196,7 @@ def resolve_delete_message(obj, resolve_info: GraphQLResolveInfo, thread_id, mes
     response = requests.delete(base_message_service_url+f"/threads/{thread_id}/messages/{message_id}", headers=headers)
 
     if response.status_code == 200:
-        return response.json()
+        return True
 
 schema = make_executable_schema(type_defs, query, mutation, message)
 app = CORSMiddleware(GraphQL(schema, debug=True), allow_origins=['*'], allow_methods=("GET", "POST", "PUT", "DELETE", "OPTIONS"))

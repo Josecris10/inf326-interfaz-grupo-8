@@ -5,6 +5,9 @@ schema {
     mutation: Mutation
 }
 
+
+
+
 type Message {
     id: ID!
     thread: Thread!
@@ -16,21 +19,57 @@ type Message {
     deleted_at: DateTime
 }
 
-type Thread {
-    id: ID!
-    name: String!
-    country: String!
-    description: String
-    players: [Player]
+type MessagesPage {
+    items: [Message!]!
+    next_cursor: String
+    has_more: Boolean!
 }
 
+
+
+
+
+enum ChannelType {
+    PUBLIC
+    PRIVATE
+}
+
+type ChannelMember {
+    id: ID!
+    joined_at: Float!
+}
+
+type Channel {
+    id: ID
+    name: String!
+    owner_id: String!
+    users: [ChannelMember!]!
+    threads: [String!]!
+    is_active: Boolean!
+    channel_type: ChannelType!
+    created_at: Float!
+    updated_at: Float!
+    deleted_at: Float
+}
+
+
+
+
+
+
 type Query {
-    listPlayers(team_id: ID): [Player]!
-    listTeams: [Team]!
-    getPlayer(id: ID!): Player!
-    getTeam(id: ID!): Team!
+    getMessage(thread_id: String!, user_id: String!): MessagesPage!
+
+    getChannel(channel_id: String!): Channel!
 }
 
 type Mutation {
-    createTeam(name: String!, country: String!, description: String): Team!
+    createMessage(thread_id: ID!, content: String!, type_: String!, paths: [String], user_id: String!): Message!
+    updateMessage(thread_id: String!, message_id: String!, content: String!, type_: String!, paths: [String], user_id: String!): Message!
+    deleteMessage(thread_id: String!, message_id: String!, user_id: String!): Boolean!
+
+    createChannel(name: String!, owner_id: String!, users: [ChannelMember!]!, channel_type: ChannelType!): Channel!
+    updateChannel(channel_id: ID!, name: String!, owner_id: String!, channel_type: ChannelType!): Channel!
+    deleteChannel(channel_id: ID!): ID!
+    reactivateChannel(channel_id: ID!): ID!
 }
