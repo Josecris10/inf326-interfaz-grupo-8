@@ -11,7 +11,7 @@ schema {
 type Message {
     id: ID!
     thread: Thread!
-    user_id: User!
+    user_id: ID!
     type: String
     paths: [String]
     created_at: DateTime!
@@ -25,14 +25,6 @@ type MessagesPage {
     has_more: Boolean!
 }
 
-type User {
-  id: ID!
-  name: String
-}
-
-
-
-
 
 enum ChannelType {
     PUBLIC
@@ -41,12 +33,12 @@ enum ChannelType {
 
 type ChannelMember {
     id: ID!
-    joined_at: Float!
+    joined_at: DateTime!
 }
 
 input ChannelMemberInput {
     id: ID!
-    joined_at: Float!
+    joined_at: DateTime!
 }
 
 input CreateChannelInput {
@@ -61,12 +53,11 @@ type Channel {
     name: String!
     owner_id: String!
     users: [ChannelMember!]!
-    threads: [String!]!
     is_active: Boolean!
     channel_type: ChannelType!
-    created_at: Float!
-    updated_at: Float!
-    deleted_at: Float
+    created_at: DateTime!
+    updated_at: DateTime!
+    deleted_at: DateTime
 }
 
 
@@ -103,11 +94,12 @@ type Mutation {
     updateChannel(channel_id: ID!, name: String!, owner_id: String!, channel_type: ChannelType!): Channel!
     deleteChannel(channel_id: ID!): ID!
     reactivateChannel(channel_id: ID!): ID!
+
+    createUser(email: String!, username: String!, password: String!, full_name: String): User!
+    updateUser(full_name: String): User!
+    loginUser(username_or_email: String!, password: String!): Token!
 }
 
-createUser(email: String!, username: String!, password: String!, full_name: String): User!
-updateUser(full_name: String): User!
-loginUser(username_or_email: String!, password: String!): Token!
 
 
 type Thread {
@@ -126,12 +118,20 @@ type Thread {
 
 extend type Query {
   # HomePage -> search channels by query string
-  searchChannels(query: String!): [Channel!]!
+  searchChannels(
+    q: String
+    channel_id: ID
+    owner_id: String
+    channel_type: String
+    is_active: Boolean
+    limit: Int 
+    offset: Int
+    ): [Channel!]!
 
   # ChannelPage -> search threads within a channel using multiple optional filters.
  
   searchThreads(
-    channel_id: ID
+    channel_id: String
     category: String
     author: String
     tag: String

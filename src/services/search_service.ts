@@ -47,22 +47,8 @@ type ThreadsByKeywordData = {
 // ===================================================================
 
 const SEARCH_MESSAGES_QUERY = /* GraphQL */ `
-	query SearchMessages(
-		$q: String
-		$authorId: Int
-		$threadId: Int
-		$messageId: Int
-		$limit: Int
-		$offset: Int
-	) {
-		searchMessages(
-			q: $q
-			authorId: $authorId
-			threadId: $threadId
-			messageId: $messageId
-			limit: $limit
-			offset: $offset
-		) {
+	query SearchMessages($query: String) {
+		searchMessages(query: $query) {
 			id
 			thread_id
 			user_id
@@ -78,21 +64,29 @@ const SEARCH_MESSAGES_QUERY = /* GraphQL */ `
 const SEARCH_CHANNELS_QUERY = /* GraphQL */ `
 	query SearchChannels(
 		$q: String
-		$channelId: Int
+		$channel_id: ID
+		$owner_id: String
+		$channel_type: String
+		$is_active: Boolean
 		$limit: Int
 		$offset: Int
 	) {
 		searchChannels(
 			q: $q
-			channelId: $channelId
+			channel_id: $channel_id
+			owner_id: $owner_id
+			channel_type: $channel_type
+			is_active: $is_active
 			limit: $limit
 			offset: $offset
 		) {
 			id
 			name
 			owner_id
-			users
-			threads
+			users {
+				id
+				joined_at
+			}
 			is_active
 			channel_type
 			created_at
@@ -195,25 +189,13 @@ const THREADS_BY_KEYWORD_QUERY = /* GraphQL */ `
 //============================== Busqueda de Messages ==============================
 
 export async function searchMessage(
-	q?: string,
-	authorId?: number,
-	threadId?: number,
-	messageId?: number,
-	limit?: number,
-	offset?: number
+	query?: string,
 ): Promise<Message[]> {
 	const data = await gqlQuery<SearchMessagesData>(
 		API_URL,
 		GRAPHQL_PATH,
 		SEARCH_MESSAGES_QUERY,
-		{
-			q,
-			authorId,
-			threadId,
-			messageId,
-			limit,
-			offset,
-		}
+		{ query }
 	);
 
 	return data.searchMessages ?? [];
@@ -311,23 +293,41 @@ export async function getThreadByKeyword(
 
 //============================== Busqueda de Channels ==============================
 
-export async function searchChannel(
-	q?: string,
-	channelId?: number,
-	limit?: number,
-	offset?: number
-): Promise<Channel[]> {
+export async function searchChannel(params?: {
+	q?: string;
+	channel_id?: string;
+	owner_id?: string;
+	channel_type?: string;
+	is_active?: Boolean;
+	limit?: number;
+	offset?: number;
+}): Promise<Channel[]> {
+	if (!params || Object.keys(params).length === 0){
+		const data = await gqlQuery<SearchChannelsData>(
+			API_URL,
+			GRAPHQL_PATH,
+			SEARCH_CHANNELS_QUERY,
+			{}
+		);
+
+		return data.searchChannels ?? [];
+	}
+
+	const variables: Record<string, any> = {};
+
+	if (params.q !== undefined) variables.q = params.q;
+	if (params.channel_id !== undefined) variables.channel_id = params.channel_id;
+	if (params.owner_id !== undefined) variables.owner_id = params.owner_id;
+	if (params.channel_type !== undefined) variables.channel_type = params.channel_type;
+	if (params.is_active !== undefined) variables.is_active = params.is_active;
+	if (params.limit !== undefined) variables.limit = params.limit;
+	if (params.offset !== undefined) variables.offset = params.offset;
+
 	const data = await gqlQuery<SearchChannelsData>(
 		API_URL,
 		GRAPHQL_PATH,
 		SEARCH_CHANNELS_QUERY,
-		{
-			q,
-			channelId,
-			limit,
-			offset,
-		}
+		variables
 	);
-
 	return data.searchChannels ?? [];
 }

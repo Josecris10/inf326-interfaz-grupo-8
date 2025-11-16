@@ -252,16 +252,53 @@ def resolve_delete_message(obj, resolve_info: GraphQLResolveInfo, thread_id, mes
 
 
 @query.field("searchChannels")
-def resolve_search_channels(obj, resolve_info: GraphQLResolveInfo, query):
+def resolve_search_channels(obj, resolve_info: GraphQLResolveInfo, 
+    q=None,
+    channel_id=None,
+    owner_id=None,
+    channel_type=None,
+    is_active=None,
+    limit=None,
+    offset=None
+                            
+):
     """
     Gateway -> delegates to: GET /api/channel/search_channel?q={query}
     Returns: array of channels (as JSON)
     """
     try:
-        resp = requests.get(f"{SEARCH_SERVICE_BASE}/api/channel/search_channel", params={"q": query}, timeout=5)
+        params = {}
+        if q is not None:
+            params["q"] = q
+        if channel_id is not None:
+            params["channel_id"] = channel_id
+        if owner_id is not None:
+            params["owner_id"] = owner_id
+        if channel_type is not None:
+            params["channel_type"] = channel_type
+        if is_active is not None:
+            params["is_active"] = str(is_active).lower() 
+        if limit is not None:
+            params["limit"] = limit
+        if offset is not None:
+            params["offset"] = offset
+        resp = requests.get(
+            f"{SEARCH_SERVICE_BASE}/api/channel/search_channel", 
+            params=params if params else None,
+            timeout=5
+        )
         if resp.status_code == 200:
             data = resp.json()
-            return data.get("channels", [])
+            normalized = []
+            for ch in data:
+                # Por si acaso algún item viene raro
+                if isinstance(ch, dict):
+                    ct = ch.get("channel_type")
+                    if ct:
+                        ch["channel_type"] = ct.upper()
+                normalized.append(ch)
+
+            return normalized
     except Exception as e:
         logging.exception("searchChannels error: %s", e)
     return []

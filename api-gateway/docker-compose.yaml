@@ -6,9 +6,9 @@ services:
     volumes:
       - .:/code
     environment:
-      - SEARCH_SERVICE_BASE=http://localhost:8088
-      - CHANNEL_SERVICE_BASE=http://localhost:8082/v1/channels
-      - MESSAGE_SERVICE_BASE=http://localhost:8084
+      - SEARCH_SERVICE_BASE=https://searchservice.inf326.nursoft.dev
+      - CHANNEL_SERVICE_BASE=https://channel-api.inf326.nur.dev/v1/channels
+      - MESSAGE_SERVICE_BASE=https://messages-service.kroder.dev
     network_mode: "host"
 
 networks:

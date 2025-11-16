@@ -1,8 +1,8 @@
 export type ChannelType = "public" | "private";
 
 export type ChannelMember = {
-	id: number;
-	joined_at: number;
+	id: string;
+	joined_at: string;
 };
 
 export type Channel = {
@@ -13,7 +13,7 @@ export type Channel = {
 	threads: string[];
 	is_active: boolean;
 	channel_type: ChannelType;
-	created_at: number;
-	updated_at: number;
-	deleted_at?: number | null;
+	created_at: string;
+	updated_at: string;
+	deleted_at?: string | null;
 };

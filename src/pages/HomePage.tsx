@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useEffect } from "react";
 import {
 	Badge,
 	Box,
@@ -8,44 +9,105 @@ import {
 	Heading,
 	HStack,
 	Input,
+	NativeSelect,
 	Stack,
 	Text,
 } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
-import { FiSearch } from "react-icons/fi";
+import { FiSearch, FiSliders } from "react-icons/fi";
 import { FaBook } from "react-icons/fa";
 import { FaCalculator } from "react-icons/fa";
 import { FaLaptopCode } from "react-icons/fa";
 import { FaTools } from "react-icons/fa";
 import { FaWikipediaW } from "react-icons/fa";
 
-import { MOCK_CHANNELS } from "../data/mock_channels";
+//import { MOCK_CHANNELS } from "../data/mock_channels";
+import { searchChannel } from "../services/search_service";
 import type { Channel } from "../types/channel";
 
 export default function HomePage() {
-	const [search, setSearch] = useState("");
 	const navigate = useNavigate();
+
+	const [showFilters, setShowFilters] = useState(false);
+
+	const [filters, setFilters] = useState({
+		type: "",
+		status: "",
+	});
 	
-	const channels = useMemo(() => MOCK_CHANNELS, []);
+	const [channels, setChannels] = useState<Channel[]>([]);
+	const [filteredChannels, setFilteredChannels] = useState<Channel[]>([]);
+	const [search, setSearch] = useState("");
 
-	const filteredChannels = useMemo(() => {
-		let result = channels;
+	const [showAdvanced, setShowAdvanced] = useState(false);
+	const [channelType, setChannelType] = useState("");
+	const [isActive, setIsActive] = useState("");
 
-		const q = search.trim().toLowerCase();
-		if (q) {
-			result = result.filter((c) =>
-				(c.name ?? "").toLowerCase().includes(q)
-			);
-		}
+	
+	// const channels = useMemo(() => MOCK_CHANNELS, []);
 
-		return result;
-	}, [channels, search]);
+	// const filteredChannels = useMemo(() => {
+	// 	let result = channels;
+
+	// 	const q = search.trim().toLowerCase();
+	// 	if (q) {
+	// 		result = result.filter((c) =>
+	// 			(c.name ?? "").toLowerCase().includes(q)
+	// 		);
+	// 	}
+
+	// 	return result;
+	// }, [channels, search]);
+
+	useEffect(() => {
+    async function fetchAll() {
+        try {
+            const all = await searchChannel(undefined); // sin query, devuelve todos
+            setChannels(all);
+            setFilteredChannels(all); // inicialmente mostramos todo
+        } catch (err) {
+            console.error("Error al cargar canales:", err);
+            setChannels([]);
+            setFilteredChannels([]);
+        }
+    }
+
+    fetchAll();
+}, []);
+
+
 
 	const handleChannelClick = (channel: Channel) => {
-		navigate(`/channels/${channel.id}`, {
-			state: { channel }
-		});
+		navigate(`/channels/${channel.id}`);
 	};
+
+	const handleSearchClick = async () => {
+		const params: any = {};
+
+		// Búsqueda libre
+		const q = search.trim();
+		if (q) params.q = q;
+
+		// Filtros
+		if (channelType) params.channel_type = channelType;
+		if (isActive) params.is_active = isActive === "true";
+
+		// Paginación automática
+		params.limit = 50;
+		params.offset = 0;
+
+		try {
+			const result = await searchChannel(params);
+			setFilteredChannels(result);
+		} catch (err) {
+			console.error("Error al buscar canales:", err);
+			setFilteredChannels([]);
+		}
+	};
+
+
+
+
 
 	return (
 		<Box minH="100vh" bg="bg.subtle">
@@ -76,16 +138,97 @@ export default function HomePage() {
 						onChange={(e) => setSearch(e.target.value)}
 						bg="bg.subtle"
 					/>
+
 					<Button
 						aria-label="Buscar"
 						variant="outline"
 						p={2}
 						bg="#004B85"
 						color="#fff"
+						onClick={handleSearchClick}
 					>
 						<FiSearch />
 					</Button>
 				</HStack>
+
+				<Box position="relative">
+					<Button
+						size="sm"
+						variant="outline"
+						bg="#004B85"
+						color="#fff"
+						onClick={() => setShowAdvanced(!showAdvanced)}
+					>
+						<HStack gap={2}>
+							<FiSliders />
+							<Text>Filtros</Text>
+							{(channelType || isActive) && (
+								<Badge colorScheme="green" borderRadius="full">●</Badge>
+							)}
+						</HStack>
+					</Button>
+
+					{showAdvanced && (
+						<Box
+							position="absolute"
+							top="110%"
+							right="0"
+							w="260px"
+							p={4}
+							bg="white"
+							borderRadius="md"
+							borderWidth="1px"
+							borderColor="gray.200"
+							boxShadow="xl"
+							zIndex={9999}
+						>
+							{/* filtros */}
+							<Stack gap={2}>
+								{/* TIPO */}
+								<Box>
+									<Text fontSize="sm" mb={1} fontWeight="medium">
+										Tipo
+									</Text>
+									<NativeSelect.Root bg="white" size="sm" borderRadius="md">
+										<NativeSelect.Field
+											value={channelType}
+											onChange={(e) => setChannelType(e.target.value)}
+										>
+											<option value="">Todos</option>
+											<option value="public">Público</option>
+											<option value="private">Privado</option>
+										</NativeSelect.Field>
+									</NativeSelect.Root>
+								</Box>
+
+								{/* ESTADO */}
+								<Box>
+									<Text fontSize="sm" mb={1} fontWeight="medium">
+										Estado
+									</Text>
+									<NativeSelect.Root bg="white" size="sm" borderRadius="md">
+										<NativeSelect.Field
+											value={isActive}
+											onChange={(e) => setIsActive(e.target.value)}
+										>
+											<option value="">Todos</option>
+											<option value="true">Activo</option>
+											<option value="false">Inactivo</option>
+										</NativeSelect.Field>
+									</NativeSelect.Root>
+								</Box>
+							</Stack>
+						</Box>
+					)}
+				</Box>
+
+			
+
+
+
+
+					
+					
 
 				<HStack maxW="sm" flex="1" ml={8} gap={2}>
 					<Button
@@ -230,9 +373,9 @@ export default function HomePage() {
 								<Text>
 									{channel.users.length} usuarios
 								</Text>
-								<Text>
+								{/* <Text>
 									{channel.threads.length} hilos
-								</Text>
+								</Text> */}
 							</HStack>
 						</Box>
 					))}
