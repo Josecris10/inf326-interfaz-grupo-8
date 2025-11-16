@@ -22,7 +22,11 @@ type_defs = load_schema_from_path("./app/schema.graphql")
 query = QueryType()
 mutation = MutationType()
 
+user = ObjectType("User")
+channel = ObjectType("Channel")
+thread = ObjectType("Thread")
 message = ObjectType("Message")
+
 # player = ObjectType("Player")
 
 # team_loader = TeamLoader()
