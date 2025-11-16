@@ -25,12 +25,6 @@ type MessagesPage {
     has_more: Boolean!
 }
 
-type User {
-  id: ID!
-  name: String
-}
-
-
 
 
 
