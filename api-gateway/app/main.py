@@ -156,6 +156,16 @@ async def resolve_get_channel(obj, resolve_info: GraphQLResolveInfo, channel_id)
     if response.status_code == 200:
         return response.json()
 
+@query.field("getChannels")
+async def resolve_get_channels(obj, resolve_info: GraphQLResolveInfo):
+    # return await channel_loader.load(channel_id)
+
+    # Without dataloader this code will make n+1 requests:
+
+    response = requests.get(base_channel_service_url+"/")
+    if response.status_code == 200:
+        return response.json()
+
 @mutation.field("createChannel")
 def resolve_create_channel(obj, resolve_info: GraphQLResolveInfo, name, owner_id, users, channel_type):
     payload = dict(name=name,

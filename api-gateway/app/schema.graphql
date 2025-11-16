@@ -61,7 +61,6 @@ type Channel {
     name: String!
     owner_id: String!
     users: [ChannelMember!]!
-    threads: [String!]!
     is_active: Boolean!
     channel_type: ChannelType!
     created_at: Float!
@@ -69,7 +68,14 @@ type Channel {
     deleted_at: Float
 }
 
-
+type ChannelBasicInfo {
+    id: ID
+    name: String!
+    owner_id: String!
+    channel_type: ChannelType!
+    created_at: Float!
+    user_count: Int!
+}
 
 type User {
   id: ID!
@@ -89,6 +95,7 @@ type Token {
 type Query {
     getMessage(thread_id: String!, user_id: String!): MessagesPage!
 
+    getChannels(): [ChannelBasicInfo]!
     getChannel(channel_id: String!): Channel!
 
     getUser(token: String!): User!
