@@ -50,10 +50,10 @@ input ChannelMemberInput {
 }
 
 input CreateChannelInput {
-  name: String!
-  owner_id: String!
-  users: [ChannelMemberInput!]!
-  channel_type: ChannelType!
+    name: String!
+    owner_id: String!
+    users: [ChannelMemberInput!]!
+    channel_type: ChannelType!
 }
 
 type Channel {
@@ -77,18 +77,29 @@ type ChannelBasicInfo {
     user_count: Int!
 }
 
+
+
+
+
+
+
+
 type User {
-  id: ID!
-  email: String!
-  username: String!
-  full_name: String
-  is_active: Boolean!
+    id: ID!
+    email: String!
+    username: String!
+    full_name: String
+    is_active: Boolean!
 }
 
 type Token {
-  access_token: String!
-  token_type: String!
+    access_token: String!
+    token_type: String!
 }
+
+
+
+
 
 
 
@@ -110,44 +121,50 @@ type Mutation {
     updateChannel(channel_id: ID!, name: String!, owner_id: String!, channel_type: ChannelType!): Channel!
     deleteChannel(channel_id: ID!): ID!
     reactivateChannel(channel_id: ID!): ID!
+
+    createUser(email: String!, username: String!, password: String!, full_name: String): User!
+    updateUser(full_name: String): User!
+    loginUser(username_or_email: String!, password: String!): Token!
 }
 
-createUser(email: String!, username: String!, password: String!, full_name: String): User!
-updateUser(full_name: String): User!
-loginUser(username_or_email: String!, password: String!): Token!
+
+
+
+
+
 
 
 type Thread {
-  id: ID!
-  title: String
-  author_id: ID
-  category: String
-  tags: [String]
-  content: String
-  created_at: DateTime
-  updated_at: DateTime
+    id: ID!
+    title: String
+    author_id: ID
+    category: String
+    tags: [String]
+    content: String
+    created_at: DateTime
+    updated_at: DateTime
 }
 
 
 
 
 extend type Query {
-  # HomePage -> search channels by query string
-  searchChannels(query: String!): [Channel!]!
+    # HomePage -> search channels by query string
+    searchChannels(query: String!): [Channel!]!
 
-  # ChannelPage -> search threads within a channel using multiple optional filters.
- 
-  searchThreads(
-    channel_id: ID
-    category: String
-    author: String
-    tag: String
-    keyword: String
-    start_date: String
-    end_date: String
-  ): [Thread!]!
+    # ChannelPage -> search threads within a channel using multiple optional filters.
+    
+    searchThreads(
+        channel_id: ID
+        category: String
+        author: String
+        tag: String
+        keyword: String
+        start_date: String
+        end_date: String
+    ): [Thread!]!
 
-  # ThreadPage -> search messages inside a thread
-  searchMessages(thread_id: ID!, query: String): [Message!]!
+    # ThreadPage -> search messages inside a thread
+    searchMessages(thread_id: ID!, query: String): [Message!]!
 }
 
