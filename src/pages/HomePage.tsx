@@ -21,12 +21,19 @@ import { FaWikipediaW } from "react-icons/fa";
 
 import { MOCK_CHANNELS } from "../data/mock_channels";
 import type { Channel } from "../types/channel";
+import { createChannel } from "../services/channels_service";
 
 export default function HomePage() {
 	const [search, setSearch] = useState("");
+	const [channels, setChannels] = useState<Channel[]>(MOCK_CHANNELS);
+
+	const userId = 1;
+	const [newName, setNewName] = useState("");
+	const [newType, setNewType] = useState<"public" | "private">("public");
+	const [isCreating, setIsCreating] = useState(false);
+	const [createError, setCreateError] = useState<string | null>(null);
+
 	const navigate = useNavigate();
-	
-	const channels = useMemo(() => MOCK_CHANNELS, []);
 
 	const filteredChannels = useMemo(() => {
 		let result = channels;
@@ -45,6 +52,37 @@ export default function HomePage() {
 		navigate(`/channels/${channel.id}`, {
 			state: { channel }
 		});
+	};
+
+	const handleCreateChannel = async () => {
+		const name = newName.trim();
+		if (!name) {
+			setCreateError("Debes ingresar un nombre para el canal.");
+			return;
+		}
+
+		setCreateError(null);
+
+		try {
+			setIsCreating(true);
+
+			const newChannel = await createChannel({
+				name,
+				owner_id: userId,
+				users: [],
+				channel_type: newType,
+			});
+
+			setChannels((prev) => [...prev, newChannel]);
+			setNewName("");
+			setNewType("public");
+		} catch (err) {
+			setCreateError(
+				err instanceof Error ? err.message : "Error inesperado al crear el canal."
+			);
+		} finally {
+			setIsCreating(false);
+		}
 	};
 
 	return (
@@ -160,6 +198,73 @@ export default function HomePage() {
 
 			{/* Contenido central con lista de canales */}
 			<Container maxW="4xl" py={8}>
+				{/* Sección para crear un canal */}
+				<Box
+					bg="bg.surface"
+					borderRadius="lg"
+					borderWidth="1px"
+					borderColor="border.subtle"
+					backgroundColor={"#edececff"}
+					p={4}
+					mb={6}
+				>
+					<Heading size="md" mb={4}>
+						Crear nuevo canal
+					</Heading>
+
+					<Stack gap={3}>
+						<Box>
+							<Text fontSize="sm" mb={1}>
+								Nombre del canal
+							</Text>
+							<Input
+								placeholder="Ej: algoritmos, ayudantías, memes..."
+								value={newName}
+								onChange={(e) => setNewName(e.target.value)}
+								bg="bg.subtle"
+							/>
+						</Box>
+
+						<Box>
+							<Text fontSize="sm" mb={1}>
+								Tipo de canal
+							</Text>
+							{/* select nativo HTML para evitar problemas con Chakra Select */}
+							<select
+								value={newType}
+								onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+									setNewType(e.target.value as "public" | "private")
+								}
+								style={{
+									width: "100%",
+									padding: "8px",
+									borderRadius: "8px",
+									border: "1px solid #ccc",
+								}}
+							>
+								<option value="public">Público</option>
+								<option value="private">Privado</option>
+							</select>
+						</Box>
+
+						{createError && (
+							<Text fontSize="sm" color="red.500">
+								{createError}
+							</Text>
+						)}
+
+						<Flex justify="flex-end">
+							<Button
+								onClick={handleCreateChannel}
+								colorScheme="blue"
+								disabled={isCreating}
+							>
+								{isCreating ? "Creando..." : "Crear canal"}
+							</Button>
+						</Flex>
+					</Stack>
+				</Box>
+
                 {/* Lista tipo Reddit */}
 				<Stack gap={4}>
 					{filteredChannels?.length === 0 && (
