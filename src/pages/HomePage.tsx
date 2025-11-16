@@ -13,7 +13,7 @@ import {
 	Stack,
 	Text,
 } from "@chakra-ui/react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { FiSearch, FiSliders } from "react-icons/fi";
 import { FaBook } from "react-icons/fa";
 import { FaCalculator } from "react-icons/fa";
@@ -36,13 +36,6 @@ export default function HomePage() {
 	const [createError, setCreateError] = useState<string | null>(null);
 
 	const navigate = useNavigate();
-
-	const [showFilters, setShowFilters] = useState(false);
-
-	const [filters, setFilters] = useState({
-		type: "",
-		status: "",
-	});
 	
 	const [channels, setChannels] = useState<Channel[]>([]);
 	const [filteredChannels, setFilteredChannels] = useState<Channel[]>([]);

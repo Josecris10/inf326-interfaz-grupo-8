@@ -93,7 +93,7 @@ type Token {
 type Query {
     getMessage(thread_id: String!, user_id: String!): MessagesPage!
 
-    getChannels(): [ChannelBasicInfo]!
+    getChannels: [ChannelBasicInfo!]!
     getChannel(channel_id: String!): Channel!
 
     getUser(token: String!): User!
@@ -109,18 +109,10 @@ type Mutation {
     deleteChannel(channel_id: ID!): ID!
     reactivateChannel(channel_id: ID!): ID!
 
-        createUser(email: String!, username: String!, password: String!, full_name: String): User!
-        updateUser(full_name: String): User!
-        loginUser(username_or_email: String!, password: String!): Token!
+    createUser(email: String!, username: String!, password: String!, full_name: String): User!
+    updateUser(full_name: String): User!
+    loginUser(username_or_email: String!, password: String!): Token!
 }
-
-
-
-
-
-
-
-
 
 
 type Thread {
@@ -143,7 +135,7 @@ extend type Query {
     q: String
     channel_id: ID
     owner_id: String
-    channel_type: String
+    channel_type: ChannelType
     is_active: Boolean
     limit: Int 
     offset: Int
@@ -157,8 +149,8 @@ extend type Query {
     author: String
     tag: String
     keyword: String
-    start_date: String
-    end_date: String
+    start_date: DateTime
+    end_date: DateTime
   ): [Thread!]!
 
     # ThreadPage -> search messages inside a thread
