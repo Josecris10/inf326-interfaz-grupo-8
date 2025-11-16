@@ -10,8 +10,8 @@ import {
 } from "@chakra-ui/react";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 import AuthLayout from "../components/auth/AuthLayout";
-import { loginUser } from "@/services/users_service";
-import { setAuthToken } from "@/services/storage";
+import { loginUser } from "../services/users_service";
+import { setAuthToken } from "../services/storage";
 
 export default function LoginPage() {
 	const [email, setEmail] = useState("");
@@ -63,7 +63,15 @@ export default function LoginPage() {
 						/>
 					</Field.Root>
 
-					<Button type="submit">
+					<Button
+						type="submit"
+						bg="#008452"
+						color="#fff"
+						_hover={{
+							bg: "#fff",
+							color: "#008452",
+						}}
+					>
 						Entrar
 					</Button>
 

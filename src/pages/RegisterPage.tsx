@@ -62,7 +62,15 @@ export default function RegisterPage() {
 						/>
 					</Field.Root>
 
-					<Button type="submit">
+					<Button
+						type="submit"
+						bg="#008452"
+						color="#fff"
+						_hover={{
+							bg: "#fff",
+							color: "#008452",
+						}}
+					>
 						Registrarme
 					</Button>
 

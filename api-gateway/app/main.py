@@ -22,7 +22,11 @@ type_defs = load_schema_from_path("./app/schema.graphql")
 query = QueryType()
 mutation = MutationType()
 
+user = ObjectType("User")
+channel = ObjectType("Channel")
+thread = ObjectType("Thread")
 message = ObjectType("Message")
+
 # player = ObjectType("Player")
 
 # team_loader = TeamLoader()
@@ -153,6 +157,16 @@ async def resolve_get_channel(obj, resolve_info: GraphQLResolveInfo, channel_id)
     # Without dataloader this code will make n+1 requests:
 
     response = requests.get(base_channel_service_url+f"/{channel_id}")
+    if response.status_code == 200:
+        return response.json()
+
+@query.field("getChannels")
+async def resolve_get_channels(obj, resolve_info: GraphQLResolveInfo):
+    # return await channel_loader.load(channel_id)
+
+    # Without dataloader this code will make n+1 requests:
+
+    response = requests.get(base_channel_service_url+"/")
     if response.status_code == 200:
         return response.json()
 

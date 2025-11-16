@@ -42,10 +42,10 @@ input ChannelMemberInput {
 }
 
 input CreateChannelInput {
-  name: String!
-  owner_id: String!
-  users: [ChannelMemberInput!]!
-  channel_type: ChannelType!
+    name: String!
+    owner_id: String!
+    users: [ChannelMemberInput!]!
+    channel_type: ChannelType!
 }
 
 type Channel {
@@ -60,26 +60,40 @@ type Channel {
     deleted_at: DateTime
 }
 
+type ChannelBasicInfo {
+    id: ID
+    name: String!
+    owner_id: String!
+    channel_type: ChannelType!
+    created_at: DateTime!
+    user_count: Int!
+}
+
 
 
 type User {
-  id: ID!
-  email: String!
-  username: String!
-  full_name: String
-  is_active: Boolean!
+    id: ID!
+    email: String!
+    username: String!
+    full_name: String
+    is_active: Boolean!
 }
 
 type Token {
-  access_token: String!
-  token_type: String!
+    access_token: String!
+    token_type: String!
 }
+
+
+
+
 
 
 
 type Query {
     getMessage(thread_id: String!, user_id: String!): MessagesPage!
 
+    getChannels(): [ChannelBasicInfo]!
     getChannel(channel_id: String!): Channel!
 
     getUser(token: String!): User!
@@ -95,22 +109,29 @@ type Mutation {
     deleteChannel(channel_id: ID!): ID!
     reactivateChannel(channel_id: ID!): ID!
 
-    createUser(email: String!, username: String!, password: String!, full_name: String): User!
-    updateUser(full_name: String): User!
-    loginUser(username_or_email: String!, password: String!): Token!
+        createUser(email: String!, username: String!, password: String!, full_name: String): User!
+        updateUser(full_name: String): User!
+        loginUser(username_or_email: String!, password: String!): Token!
 }
 
 
 
+
+
+
+
+
+
+
 type Thread {
-  id: ID!
-  title: String
-  author_id: ID
-  category: String
-  tags: [String]
-  content: String
-  created_at: DateTime
-  updated_at: DateTime
+    id: ID!
+    title: String
+    author_id: ID
+    category: String
+    tags: [String]
+    content: String
+    created_at: DateTime
+    updated_at: DateTime
 }
 
 
@@ -140,7 +161,7 @@ extend type Query {
     end_date: String
   ): [Thread!]!
 
-  # ThreadPage -> search messages inside a thread
-  searchMessages(thread_id: ID!, query: String): [Message!]!
+    # ThreadPage -> search messages inside a thread
+    searchMessages(thread_id: ID!, query: String): [Message!]!
 }
 
