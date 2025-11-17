@@ -34,10 +34,13 @@ message = ObjectType("Message")
 logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s:%(levelname)s:%(name)s:%(message)s')
 
-base_user_service_url = "http://users-service:80"
-base_channel_service_url = os.getenv("CHANNEL_SERVICE_BASE", "http://channel-api-service:8000/v1/channels")
+base_user_service_url = "https://users.inf326.nursoft.dev/docs"
+base_channel_service_url = os.getenv("CHANNEL_SERVICE_BASE", "https://channel-api.inf326.nur.dev/docs")
 base_message_service_url = os.getenv("MESSAGE_SERVICE_BASE", "http://messages-service.nursoft.dev")
 SEARCH_SERVICE_BASE = os.getenv("SEARCH_SERVICE_BASE", "http://searchservice.inf326.nursoft.devc")
+
+base_progra_chatbot_service_url = "https://chatbotprogra.inf326.nursoft.dev/chat"
+base_wikipedia_chatbot_service_url = "http://wikipedia-chatbot-134-199-176-197.nip.io/docs"
 
 # @query.field("getPlayer")
 # def resolve_get_player(obj, resolve_info: GraphQLResolveInfo, id):
@@ -386,6 +389,23 @@ def resolve_search_messages(obj, resolve_info: GraphQLResolveInfo, thread_id, qu
 
     return []
 
+
+
+@query.field("getMessagePrograChatbot")
+async def resolve_get_message_progra_chatbot(obj, resolve_info: GraphQLResolveInfo, message):
+    payload = dict(message=message)
+
+    response = requests.post(base_progra_chatbot_service_url, json=payload)
+    if response.status_code == 200:
+        return response.json()
+
+@query.field("getMessageWikipediaChatbot")
+async def resolve_get_message_wikipedia_chatbot(obj, resolve_info: GraphQLResolveInfo, message):
+    payload = dict(message=message)
+
+    response = requests.post(base_wikipedia_chatbot_service_url, json=payload)
+    if response.status_code == 200:
+        return response.json()
 
 schema = make_executable_schema(type_defs, query, mutation, message)
 app = CORSMiddleware(GraphQL(schema, debug=True), allow_origins=['*'], allow_methods=("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"))

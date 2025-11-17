@@ -85,9 +85,13 @@ type Token {
 }
 
 
+type PrograChatbotReply {
+    reply: String!
+}
 
-
-
+type WikipediaChatbotReply {
+    message: String!
+}
 
 
 type Query {
@@ -97,6 +101,9 @@ type Query {
     getChannel(channel_id: String!): Channel!
 
     getUser(token: String!): User!
+
+    getMessagePrograChatbot(message: String!): PrograChatbotReply!
+    getMessageWikipediaChatbot(message: String!): WikipediaChatbotReply!
 }
 
 type Mutation {
