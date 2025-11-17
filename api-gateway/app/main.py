@@ -40,7 +40,7 @@ base_message_service_url = os.getenv("MESSAGE_SERVICE_BASE", "http://messages-se
 SEARCH_SERVICE_BASE = os.getenv("SEARCH_SERVICE_BASE", "http://searchservice.inf326.nursoft.devc")
 
 base_progra_chatbot_service_url = "https://chatbotprogra.inf326.nursoft.dev/chat"
-base_wikipedia_chatbot_service_url = "http://wikipedia-chatbot-134-199-176-197.nip.io/docs"
+base_wikipedia_chatbot_service_url = "http://wikipedia-chatbot-134-199-176-197.nip.io/chat-wikipedia"
 
 # @query.field("getPlayer")
 # def resolve_get_player(obj, resolve_info: GraphQLResolveInfo, id):
