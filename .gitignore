@@ -25,3 +25,4 @@ dist-ssr
 
 .env
 k8s-inf326-nyc1-kubeconfig-2/
+*__pycache__
