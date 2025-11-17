@@ -47,13 +47,15 @@ type DeleteChannelData = {
 // ===================================================================
 
 const GET_CHANNEL_QUERY = /* GraphQL */ `
-	query GetChannel($channel_id: Int!) {
+	query GetChannel($channel_id: String!) {
 		getChannel(channel_id: $channel_id) {
 			id
 			name
 			owner_id
-			users
-			threads
+			users {
+				id
+				joined_at
+			}
 			is_active
 			channel_type
 			created_at
@@ -133,7 +135,7 @@ const DELETE_CHANNEL_MUTATION = /* GraphQL */ `
 
 //============================== Funciones de Servicio ==============================
 
-export async function getChannelById(channel_id: number): Promise<Channel | null> {
+export async function getChannelById(channel_id: string): Promise<Channel | null> {
 	const data = await gqlQuery<GetChannelData>(
 		API_URL,
 		GRAPHQL_PATH,

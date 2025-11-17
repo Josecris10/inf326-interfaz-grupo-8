@@ -66,7 +66,7 @@ const SEARCH_CHANNELS_QUERY = /* GraphQL */ `
 		$q: String
 		$channel_id: ID
 		$owner_id: String
-		$channel_type: String
+		$channel_type: ChannelType
 		$is_active: Boolean
 		$limit: Int
 		$offset: Int

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
 	Badge,
 	Box,
@@ -12,12 +12,13 @@ import {
 	Text,
 } from "@chakra-ui/react";
 import { FiSearch } from "react-icons/fi";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, useParams } from "react-router-dom";
 
 import { MOCK_THREADS } from "../data/mock_threads";
 import type { Channel } from "../types/channel";
 import type { Thread } from "../types/thread";
 import { createThread } from "../services/threads_service";
+import { getChannelById } from "../services/channels_service";
 
 export default function ChannelPage() {
 	const [qSearch, setQSearch] = useState("");
@@ -39,7 +40,36 @@ export default function ChannelPage() {
 	const location = useLocation() as {
 		state: { channel: Channel };
 	};
-	const channel = location.state.channel;
+	const { id: channelId } = useParams<{ id: string }>();
+
+	const [channel, setChannel] = useState<Channel | null>(location.state?.channel || null);
+	const [loading, setLoading] = useState(false);
+
+	useEffect(() => {
+		async function fetchChannel() {
+			if (!channel && channelId) {
+				setLoading(true);
+				try {
+					const data = await getChannelById(String(channelId));
+					setChannel(data);
+				} catch (err) {
+					console.error("Error al cargar el canal:", err);
+					navigate("/home"); // redirige si falla
+				} finally {
+					setLoading(false);
+				}
+			}
+		}
+		fetchChannel();
+	}, [channel, channelId, navigate]);
+
+	if (loading || !channel) {
+		return (
+			<Box minH="100vh" display="flex" alignItems="center" justifyContent="center">
+				<Text>Cargando canal...</Text>
+			</Box>
+		);
+	}
 
 	const handleQSearch = () => {
 		const q = qSearch.trim().toLowerCase();
@@ -242,12 +272,12 @@ export default function ChannelPage() {
 									</Text>
 								</Flex>
 
-								<Flex justify="space-between">
+								{/* <Flex justify="space-between">
 									<Text>Número de hilos</Text>
 									<Text fontWeight="medium">
 										{channel.threads.length}
 									</Text>
-								</Flex>
+								</Flex> */}
 							</Stack>
 						</Box>
 					</Box>

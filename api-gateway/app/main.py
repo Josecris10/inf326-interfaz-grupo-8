@@ -158,7 +158,12 @@ async def resolve_get_channel(obj, resolve_info: GraphQLResolveInfo, channel_id)
 
     response = requests.get(base_channel_service_url+f"/{channel_id}")
     if response.status_code == 200:
-        return response.json()
+        channel = response.json()
+
+        if "channel_type" in channel:
+            channel["channel_type"] = channel["channel_type"].upper()
+        
+        return channel
 
 @query.field("getChannels")
 async def resolve_get_channels(obj, resolve_info: GraphQLResolveInfo):
@@ -168,7 +173,13 @@ async def resolve_get_channels(obj, resolve_info: GraphQLResolveInfo):
 
     response = requests.get(base_channel_service_url+"/")
     if response.status_code == 200:
-        return response.json()
+        channels = response.json()
+
+        for ch in channels:
+            if "channel_type" in ch:
+                ch["channel_type"] = ch["channel_type"].upper()
+
+        return channels
 
 @mutation.field("createChannel")
 def resolve_create_channel(obj, resolve_info: GraphQLResolveInfo, name, owner_id, users, channel_type):

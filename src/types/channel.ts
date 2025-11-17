@@ -10,7 +10,6 @@ export type Channel = {
 	name: string;
 	owner_id: number;
 	users: ChannelMember[];
-	threads: string[];
 	is_active: boolean;
 	channel_type: ChannelType;
 	created_at: string;

@@ -37,13 +37,15 @@ export default function HomePage() {
 
 	const navigate = useNavigate();
 	
-	const [channels, setChannels] = useState<Channel[]>([]);
+	const [_, setChannels] = useState<Channel[]>([]);
 	const [filteredChannels, setFilteredChannels] = useState<Channel[]>([]);
 	const [search, setSearch] = useState("");
 
 	const [showAdvanced, setShowAdvanced] = useState(false);
 	const [channelType, setChannelType] = useState("");
 	const [isActive, setIsActive] = useState("");
+	
+	const {  id: channelId } = useParams<{ id: string }>();
 
 	
 	// const channels = useMemo(() => MOCK_CHANNELS, []);
@@ -80,7 +82,7 @@ export default function HomePage() {
 
 
 	const handleChannelClick = (channel: Channel) => {
-		navigate(`/channels/${channel.id}`);
+		navigate(`/channels/${channel.id}`, { state: { channel } });
 	};
 
 	const handleSearchClick = async () => {
