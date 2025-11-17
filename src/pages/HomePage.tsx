@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useEffect } from "react";
 import {
 	Badge,
@@ -13,7 +13,7 @@ import {
 	Stack,
 	Text,
 } from "@chakra-ui/react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { FiSearch, FiSliders } from "react-icons/fi";
 import { FaBook } from "react-icons/fa";
 import { FaCalculator } from "react-icons/fa";
@@ -45,8 +45,6 @@ export default function HomePage() {
 	const [channelType, setChannelType] = useState("");
 	const [isActive, setIsActive] = useState("");
 	
-	const {  id: channelId } = useParams<{ id: string }>();
-
 	
 	// const channels = useMemo(() => MOCK_CHANNELS, []);
 
@@ -93,7 +91,7 @@ export default function HomePage() {
 		if (q) params.q = q;
 
 		// Filtros
-		if (channelType) params.channel_type = channelType;
+		if (channelType) params.channel_type = channelType.toUpperCase();
 		if (isActive) params.is_active = isActive === "true";
 
 		// Paginación automática
@@ -129,7 +127,7 @@ export default function HomePage() {
 				name,
 				owner_id: userId,
 				users: [],
-				channel_type: newType,
+				channel_type: newType.toUpperCase(),
 			});
 
 			setChannels((prev) => [...prev, newChannel]);
@@ -447,10 +445,10 @@ export default function HomePage() {
 										{channel.name}
 									</Heading>
 									<Badge
-										bg={channel.channel_type === "public" ? "grey" : "yellow.500"}
+										bg={channel.channel_type.toLowerCase() === "public" ? "grey" : "yellow.500"}
 										color="white"
 									>
-										{channel.channel_type === "public" ? "Publico" : "Privado"}
+										{channel.channel_type.toLowerCase() === "public" ? "Publico" : "Privado"}
 									</Badge>
 								</HStack>
 

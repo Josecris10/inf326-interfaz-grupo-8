@@ -300,7 +300,7 @@ def resolve_search_channels(obj, resolve_info: GraphQLResolveInfo,
         if owner_id is not None:
             params["owner_id"] = owner_id
         if channel_type is not None:
-            params["channel_type"] = channel_type
+            params["channel_type"] = str(channel_type).lower()
         if is_active is not None:
             params["is_active"] = str(is_active).lower() 
         if limit is not None:
