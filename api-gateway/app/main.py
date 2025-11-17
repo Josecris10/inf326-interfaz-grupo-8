@@ -103,6 +103,8 @@ base_wikipedia_chatbot_service_url = "http://wikipedia-chatbot-134-199-176-197.n
 
 #     return requests.post(f"http://demo_04_service_02/teams", json=payload).json()
 
+# ----------------------------------------------     USER-SERVICE   ------------------------------------------------------------
+
 @query.field("getUser")
 async def resolve_get_user(obj, resolve_info: GraphQLResolveInfo, token):
     headers = {
@@ -152,6 +154,7 @@ def resolve_delete_user(obj, resolve_info: GraphQLResolveInfo, username_or_email
 
 
 
+# ----------------------------------------------     CHANNEL-SERVICE   ------------------------------------------------------------
 
 @query.field("getChannel")
 async def resolve_get_channel(obj, resolve_info: GraphQLResolveInfo, channel_id):
@@ -224,7 +227,7 @@ def resolve_delete_channel(obj, resolve_info: GraphQLResolveInfo, channel_id):
 
 
 
-
+# ----------------------------------------------     MESSAGE-SERVICE   ------------------------------------------------------------
 
 @query.field("getMessage")
 def resolve_get_message(obj, resolve_info: GraphQLResolveInfo, thread_id, user_id):
@@ -278,6 +281,9 @@ def resolve_delete_message(obj, resolve_info: GraphQLResolveInfo, thread_id, mes
     if response.status_code == 200:
         return True
 
+
+
+# ----------------------------------------------     SEARCH-SERVICE   ------------------------------------------------------------
 
 @query.field("searchChannels")
 def resolve_search_channels(obj, resolve_info: GraphQLResolveInfo, 
@@ -390,6 +396,7 @@ def resolve_search_messages(obj, resolve_info: GraphQLResolveInfo, thread_id, qu
     return []
 
 
+# ----------------------------------------------     CHATBOTS   ------------------------------------------------------------
 
 @query.field("getMessagePrograChatbot")
 async def resolve_get_message_progra_chatbot(obj, resolve_info: GraphQLResolveInfo, message):
