@@ -246,3 +246,142 @@ extend type Query {
     searchMessages(thread_id: ID!, query: String): [Message!]!
 }
 
+# -------------------- Tipos para Moderación --------------------
+type ChannelStats {
+    channel_id: ID!
+    total_violations: Int!
+    banned_users: Int! # Total de usuarios actualmente baneados (perm + temp)
+    perm_banned: Int!
+    temp_banned: Int!
+    total_users_with_strikes: Int! # Usuarios que tienen al menos un strike
+    avg_strikes: Float! # El promedio de strikes
+}
+
+type ViolationBreakdown {
+    high: Int!
+    low: Int!
+    medium: Int!
+}
+
+type ViolationSummary {
+    total: Int!
+    last_violation: DateTime
+    by_severity: ViolationBreakdown!
+}
+
+type UserModerationFullStatus {
+    user_id: ID!
+    channel_id: ID!
+    is_banned: Boolean!
+    strike_count: Int! 
+    violation_summary: ViolationSummary!
+}
+
+input CreateBlacklistWordInput {
+    word: String!
+    category: String
+    is_regex: Boolean
+    language: String
+    notes: String
+    severity: String
+}
+
+type AddBlacklistWordResult {
+    id: ID!
+    success: Boolean!
+    message: String
+}
+
+type BlacklistWord {
+    id: ID!
+    word: String!
+    added_at: DateTime!
+    added_by: ID! 
+    is_active: Boolean!
+    category: String 
+}
+
+type BlacklistPage {
+    total: Int!
+    words: [BlacklistWord!]!
+}
+
+type ModerationStatus {
+    channel_id: ID!
+    is_banned: Boolean!
+    last_violation: DateTime
+    strike_count: Int!        # Número de advertencias acumuladas
+    strikes_reset_at: DateTime
+    user_id: ID!
+}
+
+type Violation {
+    id: ID!
+    message_id: ID!
+    action_taken: String! # Ej: warning, ban, strike
+    detected_words: [String!]
+    timestamp: DateTime!
+}
+
+type UserViolationSummary {
+    user_id: ID!
+    channel_id: ID!
+    is_banned: Boolean!
+    total_violations: Int!
+    current_strikes: Int! # El servicio REST lo llama así
+    violations: [Violation!]! # El array del historial
+}
+
+type BlacklistStats {
+    total_words: Int!
+    last_refresh_at: DateTime!
+}
+
+
+
+extend type Query {
+    # Para el frontend: Obtiene si un usuario está baneado en un canal y sus strikes.
+    getUserChannelStatus(user_id: ID!, channel_id: ID!): ModerationStatus!
+
+    # ADMIN: Lista las palabras prohibidas.
+    listBlacklistWords(
+        language: String
+        category: String
+        severity: String
+        limit: Int = 50
+        skip: Int = 0
+
+    ): BlacklistPage
+
+    # ADMIN: Estadísticas de la Blacklist.
+    getBlacklistStats: BlacklistStats!
+
+    # ADMIN: Lista de usuarios actualmente baneados.
+    listBannedUsers: [ModerationStatus!]! # Usamos ModerationStatus para reutilizar.
+
+    # ADMIN: Historial de violaciones de un usuario.
+    getUserViolations(user_id: ID!, channel_id: ID!): UserViolationSummary
+
+    # ADMIN: Estado completo de moderación de un usuario.
+    getUserModerationStatus(user_id: ID!): UserModerationFullStatus
+
+    # ADMIN: Estadísticas de moderación de un canal.
+    getChannelStats(channelId: ID!): ChannelStats
+}
+
+extend type Mutation {
+    # ADMIN: Agrega una palabra a la lista negra.
+    addBlacklistWord(data: CreateBlacklistWordInput!): AddBlacklistWordResult
+
+    # ADMIN: Elimina una palabra de la lista negra.
+    deleteBlacklistWord(word_id: ID!): Boolean!
+
+    # ADMIN: Desbanea manualmente a un usuario.
+    unbanUser(user_id: ID!): Boolean!
+
+    # ADMIN: Resetea los strikes de un usuario.
+    resetUserStrikes(user_id: ID!): Boolean!
+
+    # ADMIN: Refresca el cache de palabras prohibidas.
+    refreshBlacklistCache: Boolean!
+}

@@ -26,6 +26,14 @@ user = ObjectType("User")
 channel = ObjectType("Channel")
 thread = ObjectType("Thread")
 message = ObjectType("Message")
+violation_breakdown = ObjectType("ViolationBreakdown")
+violation_summary = ObjectType("ViolationSummary")
+moderation_status = ObjectType("ModerationStatus")
+blacklist_word = ObjectType("BlacklistWord")
+blacklist_stats = ObjectType("BlacklistStats")
+violation = ObjectType("Violation")
+channel_stats = ObjectType("ChannelStats")
+user_moderation_full_status = ObjectType("UserModerationFullStatus")
 
 # player = ObjectType("Player")
 
@@ -34,12 +42,14 @@ message = ObjectType("Message")
 logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s:%(levelname)s:%(name)s:%(message)s')
 
+ADMIN_API_KEY = os.getenv("MODERATION_ADMIN_KEY", None)
 base_user_service_url = "https://users.inf326.nursoft.dev/docs"
 base_channel_service_url = os.getenv("CHANNEL_SERVICE_BASE", "https://channel-api.inf326.nur.dev/docs")
 base_message_service_url = os.getenv("MESSAGE_SERVICE_BASE", "http://messages-service.nursoft.dev")
 SEARCH_SERVICE_BASE = os.getenv("SEARCH_SERVICE_BASE", "http://searchservice.inf326.nursoft.devc")
 
 base_progra_chatbot_service_url = "https://chatbotprogra.inf326.nursoft.dev/chat"
+base_moderation_service_url = "https://moderation.inf326.nur.dev/api/v1"
 
 # ESTAS URL DEBEN CAMBIARSE SI O SI, DEJE ESTAS DE MOMENTO PORQUE ES LA INFO QUE SE TIENE HASTA AHORA, PERO DEBEN
 # CAMBIARSE A LA ADAPTACIÓN EN EL CLUSTER
@@ -488,5 +498,218 @@ def resolve_delete_presence(obj, resolve_info: GraphQLResolveInfo, userId):
     if response.status_code == 200:
         return response.json()
 
-schema = make_executable_schema(type_defs, query, mutation, message)
+# ----------------------------------------------     MODERATION-SERVICE   ------------------------------------------------------------
+@query.field("getUserChannelStatus")
+def resolve_get_user_channel_status(obj, resolve_info: GraphQLResolveInfo, user_id, channel_id):
+    """
+    Delegates to: GET /api/v1/moderation/status/{user_id}/{channel_id}
+    """
+    try:
+        url = f"{base_moderation_service_url}/moderation/status/{user_id}/{channel_id}"
+        response = requests.get(url, timeout=5)
+
+        if response.status_code == 200:
+            return response.json()
+        
+        logging.warning(f"Moderation status failed for {user_id}/{channel_id}: {response.text}")
+    except Exception as e:
+        logging.exception("getUserChannelStatus error: %s", e)
+    
+    # Retorna un estado por defecto si falla la conexión o el código de estado no es 200
+    return {
+        "channel_id": channel_id,
+        "is_banned": False,
+        "last_violation": None,
+        "strike_count": 0,
+        "strike_reset_at": None,
+        "user_id": user_id,
+    }
+
+@query.field("getUserModerationStatus")
+def resolve_get_user_moderation_status(obj, resolve_info: GraphQLResolveInfo, user_id, channel_id):
+    """
+    ADMIN. Delegates to: GET /api/v1/admin/users/{user_id}/status
+    Retorna UserModerationFullStatus (anulable).
+    """
+    try:
+        headers = {"X-API-Key": ADMIN_API_KEY}
+        url = f"{base_moderation_service_url}/admin/users/{user_id}/status?channel_id={channel_id}" 
+        response = requests.get(url, headers=headers, timeout=5)
+
+        if response.status_code == 200:
+            data = response.json()
+            
+            data['user_id'] = user_id
+            data['channel_id'] = channel_id
+            
+            if data.get('strike_count') is None:
+                data['strike_count'] = 0
+            
+            if data.get('violation_summary') is None:
+                data['violation_summary'] = {
+                    "total": 0, 
+                    "by_severity": {"high": 0, "low": 0, "medium": 0}
+                }
+            
+            return data
+        
+        logging.error(f"Moderation Status endpoint returned status {response.status_code}")
+        return None
+
+    except Exception as e:
+        logging.exception("getUserModerationStatus failed.")
+        return None
+
+@query.field("getUserViolations")
+def resolve_get_user_violations(obj, resolve_info: GraphQLResolveInfo, user_id, channel_id):
+    """
+    ADMIN. Delegates to: GET /api/v1/admin/users/{user_id}/violations?channel_id={channel_id}
+    NOTE: Requires API Key header X-API-Key (implementation omitted for simplicity)
+    """
+    try:
+        headers = {
+            "X-API-Key": ADMIN_API_KEY
+        }
+        url = f"{base_moderation_service_url}/admin/users/{user_id}/violations?channel_id={channel_id}"
+        # Aquí deberías agregar headers = {"X-API-Key": "YOUR_ADMIN_KEY"}
+        response = requests.get(url, headers=headers, timeout=5) 
+
+        if response.status_code == 200:
+            data = response.json()
+            data['user_id'] = user_id
+            data['channel_id'] = channel_id
+            if data.get('current_strikes') is None:
+                data['current_strikes'] = 0
+            if data.get('total_violations') is None:
+                data['total_violations'] = 0
+            if data.get('is_banned') is None:
+                data['is_banned'] = False
+            return data
+    except Exception as e:
+        logging.exception("getUserViolations error: %s", e)
+        return None
+
+@query.field("getChannelStats")
+def resolve_get_channel_stats(obj, resolve_info: GraphQLResolveInfo, channelId):
+    """
+    ADMIN. Delegates to: GET /api/v1/admin/channels/{channel_id}/stats
+    """
+    try:
+        headers = {
+            "X-API-Key": ADMIN_API_KEY
+        }
+        url = f"{base_moderation_service_url}/admin/channels/{channelId}/stats"
+        # Aquí se asume la autenticación de administrador (ej: X-API-Key)
+        response = requests.get(url, headers=headers, timeout=5) 
+
+        if response.status_code == 200:
+            data = response.json()
+            data['channel_id'] = channelId
+            
+            if data.get('total_violations') is None:
+                data['total_violations'] = 0
+            return data
+        logging.error(f"Moderation Stats Service returned stauts {response.status_code} for {channelId}")
+        return None
+    except Exception as e:
+        logging.exception("getChannelStats error: %s", e)
+        return None
+
+@mutation.field("addBlacklistWord")
+def resolve_add_blacklist_word(obj, resolve_info: GraphQLResolveInfo, data):
+    """
+    ADMIN. Delegates to: POST /api/v1/blacklist/words
+    NOTE: Requires API Key header X-API-Key
+    """
+    try:
+        headers = {
+            "X-API-Key": ADMIN_API_KEY
+        }
+        url = f"{base_moderation_service_url}/blacklist/words"
+        payload = {
+            "word": data.get('word'),
+            "category": data.get('category') or "insult",
+            "is_regex": data.get('is_regex', False),
+            "language": data.get('language') or "es",
+            "notes": data.get('notes'),
+            "severity": data.get('severity')
+        }
+        payload_filtered = {k: v for k, v in payload.items() if v is not None}
+        # Aquí deberías agregar headers = {"X-API-Key": "YOUR_ADMIN_KEY"}
+        response = requests.post(url, json=payload_filtered, headers=headers, timeout=5)
+
+
+        if response.status_code in (200, 201):
+            response_json = response.json()
+            
+            new_id = response_json.get('data', {}).get('id')
+            
+            if new_id:
+                return {
+                    "id": new_id,
+                    "success": response_json.get('success', True),
+                    "message": response_json.get('message', "Operación completada.")
+                }
+            
+        logging.error(f"Moderation Service POST /blacklist/words failed with status {response.status_code}")
+        return None
+            
+
+    except Exception as e:
+        logging.exception("addBlacklistWord error: %s", e)
+        return None 
+
+@query.field("listBlacklistWords")
+def resolve_list_blacklist_words(obj, resolve_info: GraphQLResolveInfo, 
+                                 language=None, category=None, severity=None,
+                                 limit=None, skip=None):
+    """
+    ADMIN. Delegates to: GET /api/v1/blacklist/words
+    retorna BlacklistPage { total, words }
+    """
+    try:
+        headers= {
+            "X-API-KEY": ADMIN_API_KEY
+        }
+        url = f"{base_moderation_service_url}/blacklist/words"
+        params = {}
+        if language is not None:
+            params['language'] = language
+        if category is not None:
+            params['category'] = category
+        if severity is not None:
+            params['severity'] = severity
+        if limit is not None:
+            params['limit'] = limit
+        if skip is not None:
+            params['skip'] = skip
+        response = requests.get(url, params=params, headers=headers, timeout=5)
+        
+        if response.status_code == 200:
+            data = response.json()
+            if data.get('total') is None:
+                data['total'] = 0
+            if data.get('words') is None:
+                data['words'] = []
+            return data 
+        logging.error(f"Moderation Service GET /blacklist/words failed with status {response.status_code}")
+        return None
+    except Exception as e:
+        logging.exception("listBlacklistWords error: %s", e)
+        return None
+    
+
+schema = make_executable_schema(
+    type_defs,
+    query,
+    mutation,
+    message,
+    moderation_status,
+    blacklist_stats,
+    blacklist_word,
+    blacklist_stats,
+    violation,
+    channel_stats,
+    user_moderation_full_status
+)
 app = CORSMiddleware(GraphQL(schema, debug=True), allow_origins=['*'], allow_methods=("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"))
