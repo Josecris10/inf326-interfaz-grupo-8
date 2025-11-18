@@ -423,6 +423,7 @@ async def resolve_get_message_wikipedia_chatbot(obj, resolve_info: GraphQLResolv
 
 @query.field("getPresence")
 def resolve_get_presence(obj, resolve_info: GraphQLResolveInfo, statusEnum):
+    # Obtener objetos de datos de presencia almacenados para los diferentes usuarios
     param = ""
 
     if statusEnum:
@@ -435,6 +436,7 @@ def resolve_get_presence(obj, resolve_info: GraphQLResolveInfo, statusEnum):
 
 @query.field("getPresenceStats")
 def resolve_get_presence_stats(obj, resolve_info: GraphQLResolveInfo):
+    # Obtener estadísticas de presencia; totales online y offline
     response = requests.get(base_presence_service_url+"/presence/stats")
 
     if response.status_code == 200:
@@ -442,6 +444,7 @@ def resolve_get_presence_stats(obj, resolve_info: GraphQLResolveInfo):
 
 @query.field("getPresenceUser")
 def resolve_get_presence_user(obj, resolve_info: GraphQLResolveInfo, userId):
+    # Obtener datos de presencia para un usuario en particular
     response = requests.get(base_presence_service_url+"/presence/"+userId)
 
     if response.status_code == 200:
