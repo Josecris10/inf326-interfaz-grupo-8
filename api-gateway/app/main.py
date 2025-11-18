@@ -40,7 +40,11 @@ base_message_service_url = os.getenv("MESSAGE_SERVICE_BASE", "http://messages-se
 SEARCH_SERVICE_BASE = os.getenv("SEARCH_SERVICE_BASE", "http://searchservice.inf326.nursoft.devc")
 
 base_progra_chatbot_service_url = "https://chatbotprogra.inf326.nursoft.dev/chat"
+
+# ESTAS URL DEBEN CAMBIARSE SI O SI, DEJE ESTAS DE MOMENTO PORQUE ES LA INFO QUE SE TIENE HASTA AHORA, PERO DEBEN
+# CAMBIARSE A LA ADAPTACIÓN EN EL CLUSTER
 base_wikipedia_chatbot_service_url = "http://wikipedia-chatbot-134-199-176-197.nip.io/chat-wikipedia"
+base_presence_service_url = "http://presence-134-199-176-197.nip.io/api/v1.0.0"
 
 # @query.field("getPlayer")
 # def resolve_get_player(obj, resolve_info: GraphQLResolveInfo, id):
@@ -411,6 +415,73 @@ async def resolve_get_message_wikipedia_chatbot(obj, resolve_info: GraphQLResolv
     payload = dict(message=message)
 
     response = requests.post(base_wikipedia_chatbot_service_url, json=payload)
+    if response.status_code == 200:
+        return response.json()
+
+
+# ----------------------------------------------     PRESENCE-SERVICE   ------------------------------------------------------------
+
+@query.field("getPresence")
+def resolve_get_presence(obj, resolve_info: GraphQLResolveInfo, statusEnum):
+    param = ""
+
+    if statusEnum:
+        param = "?status=" + statusEnum
+
+    response = requests.get(base_presence_service_url+"/presence"+param)
+
+    if response.status_code == 200:
+        return response.json()
+
+@query.field("getPresenceStats")
+def resolve_get_presence_stats(obj, resolve_info: GraphQLResolveInfo):
+    response = requests.get(base_presence_service_url+"/presence/stats")
+
+    if response.status_code == 200:
+        return response.json()
+
+@query.field("getPresenceUser")
+def resolve_get_presence_user(obj, resolve_info: GraphQLResolveInfo, userId):
+    response = requests.get(base_presence_service_url+"/presence/"+userId)
+
+    if response.status_code == 200:
+        return response.json()
+
+@mutation.field("registerPresence")
+def resolve_register_presence(obj, resolve_info: GraphQLResolveInfo, userId, device, ip):
+    payload = {}
+    payload["userId"] = userId
+
+    if device:
+        payload["device"] = device
+
+    if ip:
+        payload["ip"] = ip
+
+    response = requests.post(base_presence_service_url+"/presence", json=payload)
+
+    if response.status_code == 200:
+        return response.json()
+
+@mutation.field("updatePresence")
+def resolve_update_presence(obj, resolve_info: GraphQLResolveInfo, userId, status, heartbeat):
+    payload = {}
+
+    if status:
+        payload["status"] = status #Cambiar a online u offline
+
+    if heartbeat:
+        payload["heartbeat"] = heartbeat #Actualizar de forma interna la última hora donde se obtuvo el estado del usuario, no es compatible si se ingresa de forma simultanea con status
+
+    response = requests.patch(base_presence_service_url+"/presence/"+userId, json=payload)
+
+    if response.status_code == 200:
+        return response.json()
+
+@mutation.field("deletePresence")
+def resolve_delete_presence(obj, resolve_info: GraphQLResolveInfo, userId):
+    response = requests.patch(base_presence_service_url+"/presence/"+userId)
+
     if response.status_code == 200:
         return response.json()
 

@@ -94,6 +94,80 @@ type WikipediaChatbotReply {
 }
 
 
+
+
+enum StatusEnum {
+    online
+    offline
+}
+
+enum DeviceEnum {
+    web
+    mobile
+    desktop
+    unknown
+}
+
+type UserPresence {
+    id: ID!
+    userId: ID!
+    device: DeviceEnum!
+    status: StatusEnum!
+    connectedAt: DateTime!
+    lastSeen: DateTime!
+}
+
+type DataPresenceReply {
+    total_users: Int
+    users: [UserPresence]
+}
+
+type GetPresenceReply {
+    status: String!
+    message: String!
+    data: DataPresenceReply
+}
+
+
+type DataPresenceStatsReply {
+    total: Int!
+    online: Int!
+    offline: Int!
+}
+
+type GetPresenceStatsReply {
+    status: String!
+    message: String!
+    data: DataPresenceStatsReply
+}
+
+type GetPresenceUserReply {
+    status: String!
+    message: String!
+    data: UserPresence
+}
+
+
+type DataRegisterPresence {
+    userId: ID!
+    device: DeviceEnum!
+    status: StatusEnum!
+    connectedAt: DateTime!
+    lastSeen: DateTime!
+}
+
+type RegisterPresenceReply {
+    status: String!
+    message: String!
+    data: DataRegisterPresence!
+}
+
+type UpdateDeletePresenceReply {
+    status: String!
+    message: String!
+    data: String
+}
+
 type Query {
     getMessage(thread_id: String!, user_id: String!): MessagesPage!
 
@@ -104,6 +178,10 @@ type Query {
 
     getMessagePrograChatbot(message: String!): PrograChatbotReply!
     getMessageWikipediaChatbot(message: String!): WikipediaChatbotReply!
+
+    getPresence(statusEnum: StatusEnum): GetPresenceReply!
+    getPresenceStats: GetPresenceStatsReply!
+    getPresenceUser(userId: String!): GetPresenceUserReply!
 }
 
 type Mutation {
@@ -119,6 +197,10 @@ type Mutation {
     createUser(email: String!, username: String!, password: String!, full_name: String): User!
     updateUser(full_name: String): User!
     loginUser(username_or_email: String!, password: String!): Token!
+
+    registerPresence(userId: String!, device: DeviceEnum, ip: String): RegisterPresenceReply!
+    updatePresence(userId: String!, status: StatusEnum, heartbeat: Boolean): UpdateDeletePresenceReply!
+    deletePresence(userId: String!): UpdateDeletePresenceReply!
 }
 
 
