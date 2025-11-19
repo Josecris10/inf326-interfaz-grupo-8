@@ -30,7 +30,7 @@ export default function LoginPage() {
 			navigate("/home");
 		} catch (error) {
 			console.log(error);
-			navigate("/home");
+			alert("Credenciales inválidas");
 		}
 	};
 

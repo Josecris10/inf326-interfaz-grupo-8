@@ -2,8 +2,8 @@
 import { gqlQuery } from "./common";
 import type { Thread } from "../types/thread";
 
-const API_URL = import.meta.env.VITE_API_GATEWAY_URL ?? "http://localhost:8000";
-const GRAPHQL_PATH = "/graphql";
+const API_URL = import.meta.env.VITE_API_GATEWAY_URL;
+const GRAPHQL_PATH = "";
 
 // ===================================================================
 //  Definiciones de tipos de las respuestas GraphQL (data)

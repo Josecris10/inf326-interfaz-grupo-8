@@ -1,8 +1,8 @@
 import type { User } from "../types/user";
 import { gqlQuery } from "./common";
 
-const API_URL = import.meta.env.VITE_API_GATEWAY_URL ?? "http://localhost:8000";
-const GRAPHQL_PATH = "/graphql";
+const API_URL = import.meta.env.VITE_API_GATEWAY_URL;
+const GRAPHQL_PATH = "";
 
 // ===================================================================
 //  Definiciones de tipos de las respuestas GraphQL (data)
@@ -104,7 +104,6 @@ const LOGIN_USER_MUTATION = /* GraphQL */ `
 		) {
 			access_token
 			token_type
-			expires_in
 		}
 	}
 `;

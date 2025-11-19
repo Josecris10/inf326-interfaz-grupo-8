@@ -11,16 +11,28 @@ import {
 } from "@chakra-ui/react";
 import { Link as RouterLink } from "react-router-dom";
 import AuthLayout from "../components/auth/AuthLayout";
+import { createUser } from "@/services/users_service";
 
 export default function RegisterPage() {
-	const [name, setName] = useState("");
+	const [username, setName] = useState("");
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
+	const [full_name, setFull_name] = useState("");
 
-	const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+	const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-		// TODO: llamada a tu API de registro
-		console.log({ name, email, password });
+		try {
+			const Res = await createUser({
+				email,
+				username,
+				password,
+				full_name
+			})
+			alert("✅ Usuario registrado correctamente");
+		} catch (error) {
+			console.log(error);
+			alert("Ocurrió un error inesperado, intente más tarde");
+		}
 	};
 
 	return (
@@ -31,17 +43,17 @@ export default function RegisterPage() {
 			<form onSubmit={handleSubmit}>
 				<Stack gap={4}>
 					<Field.Root>
-						<Field.Label>Nombre</Field.Label>
+						<Field.Label>Nombre de usuario <span color="#f00">(*)</span></Field.Label>
 						<Input
-							value={name}
+							value={username}
 							onChange={(e) => setName(e.target.value)}
-							placeholder="Tu nombre"
+							placeholder="Tu nombre de usuario"
 							required
 						/>
 					</Field.Root>
 
 					<Field.Root>
-						<Field.Label>Email</Field.Label>
+						<Field.Label>Email <span color="#f00">(*)</span></Field.Label>
 						<Input
 							type="email"
 							value={email}
@@ -52,13 +64,23 @@ export default function RegisterPage() {
 					</Field.Root>
 
 					<Field.Root>
-						<Field.Label>Contraseña</Field.Label>
+						<Field.Label>Contraseña (longitud de al menos 8 caracteres)<span color="#f00">(*)</span></Field.Label>
 						<Input
 							type="password"
 							value={password}
+							minLength={8}
 							onChange={(e) => setPassword(e.target.value)}
 							placeholder="********"
 							required
+						/>
+					</Field.Root>
+
+					<Field.Root>
+						<Field.Label>Nombre completo</Field.Label>
+						<Input
+							value={full_name}
+							onChange={(e) => setFull_name(e.target.value)}
+							placeholder="Nombres y Apellidos"
 						/>
 					</Field.Root>
 

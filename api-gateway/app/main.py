@@ -12,6 +12,7 @@ from ariadne import load_schema_from_path
 from ariadne.asgi import GraphQL
 
 from graphql.type import GraphQLResolveInfo
+from graphql import GraphQLError
 
 from starlette.middleware.cors import CORSMiddleware
 
@@ -43,7 +44,7 @@ logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s:%(levelname)s:%(name)s:%(message)s')
 
 ADMIN_API_KEY = os.getenv("MODERATION_ADMIN_KEY", None)
-base_user_service_url = "https://users.inf326.nursoft.dev/docs"
+base_user_service_url = "https://users.inf326.nursoft.dev/v1"
 base_channel_service_url = os.getenv("CHANNEL_SERVICE_BASE", "https://channel-api.inf326.nur.dev/docs")
 base_message_service_url = os.getenv("MESSAGE_SERVICE_BASE", "http://messages-service.nursoft.dev")
 SEARCH_SERVICE_BASE = os.getenv("SEARCH_SERVICE_BASE", "http://searchservice.inf326.nursoft.devc")
@@ -126,8 +127,11 @@ async def resolve_get_user(obj, resolve_info: GraphQLResolveInfo, token):
     }
 
     response = requests.get(base_user_service_url+"/users/me", headers=headers)
-    if response.status_code == 200:
+    if response.status_code == 200 or response.status_code == 201:
         return response.json()
+    
+    raise GraphQLError("Invalid token or user not found")
+    
 
 @mutation.field("createUser")
 def resolve_create_user(obj, resolve_info: GraphQLResolveInfo, email, username, password, full_name):
@@ -140,8 +144,10 @@ def resolve_create_user(obj, resolve_info: GraphQLResolveInfo, email, username, 
 
     response = requests.post(base_user_service_url+"/users/register", json=payload)
 
-    if response.status_code == 201:
+    if response.status_code == 200 or response.status_code == 201:
         return response.json()
+
+    raise GraphQLError(f"User creation failed: {response.text}")
 
 @mutation.field("updateUser")
 def resolve_update_user(obj, resolve_info: GraphQLResolveInfo, full_name):
@@ -150,23 +156,25 @@ def resolve_update_user(obj, resolve_info: GraphQLResolveInfo, full_name):
     if full_name:
         payload['full_name'] = full_name
 
-    response = requests.patch(base_channel_service_url+"/users/me", json=payload)
+    response = requests.patch(base_user_service_url+"/users/me", json=payload)
 
-    if response.status_code == 200:
+    if response.status_code == 200 or response.status_code == 201:
         return response.json()
+
+    raise GraphQLError(f"User update failed: {response.text}")
 
 @mutation.field("loginUser")
 def resolve_delete_user(obj, resolve_info: GraphQLResolveInfo, username_or_email, password):
     payload = dict(username_or_email=username_or_email,
                     password=password)
 
-    response = requests.post(base_channel_service_url+"/auth/login", json=payload)
+    response = requests.post(base_user_service_url+"/auth/login", json=payload)
 
-    if response.status_code == 201:
+    if response.status_code == 200 or response.status_code == 201:
         return response.json()
 
-
-
+    # Manejo de error estándar
+    raise GraphQLError(f"Login failed: {response.text}")
 
 # ----------------------------------------------     CHANNEL-SERVICE   ------------------------------------------------------------
 
@@ -177,13 +185,15 @@ async def resolve_get_channel(obj, resolve_info: GraphQLResolveInfo, channel_id)
     # Without dataloader this code will make n+1 requests:
 
     response = requests.get(base_channel_service_url+f"/{channel_id}")
-    if response.status_code == 200:
+    if response.status_code == 200 or response.status_code == 201:
         channel = response.json()
 
         if "channel_type" in channel:
             channel["channel_type"] = channel["channel_type"].upper()
         
         return channel
+
+    raise GraphQLError(f"Channel not found: {response.text}")
 
 @query.field("getChannels")
 async def resolve_get_channels(obj, resolve_info: GraphQLResolveInfo):
@@ -192,7 +202,7 @@ async def resolve_get_channels(obj, resolve_info: GraphQLResolveInfo):
     # Without dataloader this code will make n+1 requests:
 
     response = requests.get(base_channel_service_url+"/")
-    if response.status_code == 200:
+    if response.status_code == 200 or response.status_code == 201:
         channels = response.json()
 
         for ch in channels:
@@ -200,6 +210,8 @@ async def resolve_get_channels(obj, resolve_info: GraphQLResolveInfo):
                 ch["channel_type"] = ch["channel_type"].upper()
 
         return channels
+    
+    raise GraphQLError(f"Unexpected error occured: {response.text}")
 
 @mutation.field("createChannel")
 def resolve_create_channel(obj, resolve_info: GraphQLResolveInfo, name, owner_id, users, channel_type):
@@ -210,8 +222,10 @@ def resolve_create_channel(obj, resolve_info: GraphQLResolveInfo, name, owner_id
 
     response = requests.post(base_channel_service_url, json=payload)
 
-    if response.status_code == 201:
+    if response.status_code == 200 or response.status_code == 201:
         return response.json()
+
+    raise GraphQLError(f"Channel creation failed: {response.text}")
 
 @mutation.field("updateChannel")
 def resolve_update_channel(obj, resolve_info: GraphQLResolveInfo, channel_id, name, owner_id, channel_type):
@@ -221,24 +235,29 @@ def resolve_update_channel(obj, resolve_info: GraphQLResolveInfo, channel_id, na
 
     response = requests.put(base_channel_service_url+f"/{channel_id}", json=payload)
 
-    if response.status_code == 200:
+    if response.status_code == 200 or response.status_code == 201:
         return response.json()
+
+    raise GraphQLError(f"Channel update failed: {response.text}")
 
 @mutation.field("reactivateChannel")
 def resolve_reactivate_channel(obj, resolve_info: GraphQLResolveInfo, channel_id):
     response = requests.post(base_channel_service_url+f"/{channel_id}/reactivate")
 
-    if response.status_code == 200:
+    if response.status_code == 200 or response.status_code == 201:
         return response.json()
+
+    raise GraphQLError(f"Channel reactivation failed: {response.text}")
 
 @mutation.field("deleteChannel")
 def resolve_delete_channel(obj, resolve_info: GraphQLResolveInfo, channel_id):
     
     response = requests.delete(base_channel_service_url+f"/{channel_id}")
 
-    if response.status_code == 200:
+    if response.status_code == 200 or response.status_code == 201:
         return response.json()
 
+    raise GraphQLError(f"Channel elimination failed: {response.text}")
 
 
 # ----------------------------------------------     MESSAGE-SERVICE   ------------------------------------------------------------
@@ -251,7 +270,7 @@ def resolve_get_message(obj, resolve_info: GraphQLResolveInfo, thread_id, user_i
 
     response = requests.get(base_message_service_url+f"/threads/{thread_id}/messages", headers=headers)
 
-    if response.status_code == 200:
+    if response.status_code == 200 or response.status_code == 201:
         return response.json()
 
 @mutation.field("createMessage")
@@ -266,7 +285,7 @@ def resolve_create_message(obj, resolve_info: GraphQLResolveInfo, thread_id, con
 
     response = requests.post(base_message_service_url+f"/threads/{thread_id}/messages", json=payload, headers=headers)
 
-    if response.status_code == 200:
+    if response.status_code == 200 or response.status_code == 201:
         return response.json()
 
 @mutation.field("updateMessage")
@@ -281,7 +300,7 @@ def resolve_update_message(obj, resolve_info: GraphQLResolveInfo, thread_id, mes
 
     response = requests.put(base_message_service_url+f"/threads/{thread_id}/messages/{message_id}", json=payload, headers=headers)
 
-    if response.status_code == 200:
+    if response.status_code == 200 or response.status_code == 201:
         return response.json()
 
 @mutation.field("deleteMessage")
@@ -292,7 +311,7 @@ def resolve_delete_message(obj, resolve_info: GraphQLResolveInfo, thread_id, mes
     
     response = requests.delete(base_message_service_url+f"/threads/{thread_id}/messages/{message_id}", headers=headers)
 
-    if response.status_code == 200:
+    if response.status_code == 200 or response.status_code == 201:
         return True
 
 
@@ -335,7 +354,7 @@ def resolve_search_channels(obj, resolve_info: GraphQLResolveInfo,
             params=params if params else None,
             timeout=5
         )
-        if resp.status_code == 200:
+        if response.status_code == 200 or response.status_code == 201:
             data = resp.json()
             normalized = []
             for ch in data:
@@ -374,7 +393,7 @@ def resolve_search_threads(obj, resolve_info: GraphQLResolveInfo,
             # Si no hay filtros, retornar vacío
             return []
 
-        if resp.status_code == 200:
+        if response.status_code == 200 or response.status_code == 201:
             # Asegúrate de devolver una lista
             data = resp.json()
             if isinstance(data, dict):
@@ -401,7 +420,7 @@ def resolve_search_messages(obj, resolve_info: GraphQLResolveInfo, thread_id, qu
             params["q"] = query
 
         resp = requests.get(f"{SEARCH_SERVICE_BASE}/api/message/search_message", params=params, timeout=6)
-        if resp.status_code == 200:
+        if response.status_code == 200 or response.status_code == 201:
             data = resp.json()
             return data.get("messages", [])
     except Exception as e:
@@ -417,7 +436,7 @@ async def resolve_get_message_progra_chatbot(obj, resolve_info: GraphQLResolveIn
     payload = dict(message=message)
 
     response = requests.post(base_progra_chatbot_service_url, json=payload)
-    if response.status_code == 200:
+    if response.status_code == 200 or response.status_code == 201:
         return response.json()
 
 @query.field("getMessageWikipediaChatbot")
@@ -425,7 +444,7 @@ async def resolve_get_message_wikipedia_chatbot(obj, resolve_info: GraphQLResolv
     payload = dict(message=message)
 
     response = requests.post(base_wikipedia_chatbot_service_url, json=payload)
-    if response.status_code == 200:
+    if response.status_code == 200 or response.status_code == 201:
         return response.json()
 
 
@@ -441,7 +460,7 @@ def resolve_get_presence(obj, resolve_info: GraphQLResolveInfo, statusEnum):
 
     response = requests.get(base_presence_service_url+"/presence"+param)
 
-    if response.status_code == 200:
+    if response.status_code == 200 or response.status_code == 201:
         return response.json()
 
 @query.field("getPresenceStats")
@@ -449,7 +468,7 @@ def resolve_get_presence_stats(obj, resolve_info: GraphQLResolveInfo):
     # Obtener estadísticas de presencia; totales online y offline
     response = requests.get(base_presence_service_url+"/presence/stats")
 
-    if response.status_code == 200:
+    if response.status_code == 200 or response.status_code == 201:
         return response.json()
 
 @query.field("getPresenceUser")
@@ -457,7 +476,7 @@ def resolve_get_presence_user(obj, resolve_info: GraphQLResolveInfo, userId):
     # Obtener datos de presencia para un usuario en particular
     response = requests.get(base_presence_service_url+"/presence/"+userId)
 
-    if response.status_code == 200:
+    if response.status_code == 200 or response.status_code == 201:
         return response.json()
 
 @mutation.field("registerPresence")
@@ -473,7 +492,7 @@ def resolve_register_presence(obj, resolve_info: GraphQLResolveInfo, userId, dev
 
     response = requests.post(base_presence_service_url+"/presence", json=payload)
 
-    if response.status_code == 200:
+    if response.status_code == 200 or response.status_code == 201:
         return response.json()
 
 @mutation.field("updatePresence")
@@ -488,14 +507,14 @@ def resolve_update_presence(obj, resolve_info: GraphQLResolveInfo, userId, statu
 
     response = requests.patch(base_presence_service_url+"/presence/"+userId, json=payload)
 
-    if response.status_code == 200:
+    if response.status_code == 200 or response.status_code == 201:
         return response.json()
 
 @mutation.field("deletePresence")
 def resolve_delete_presence(obj, resolve_info: GraphQLResolveInfo, userId):
     response = requests.patch(base_presence_service_url+"/presence/"+userId)
 
-    if response.status_code == 200:
+    if response.status_code == 200 or response.status_code == 201:
         return response.json()
 
 # ----------------------------------------------     MODERATION-SERVICE   ------------------------------------------------------------
@@ -508,7 +527,7 @@ def resolve_get_user_channel_status(obj, resolve_info: GraphQLResolveInfo, user_
         url = f"{base_moderation_service_url}/moderation/status/{user_id}/{channel_id}"
         response = requests.get(url, timeout=5)
 
-        if response.status_code == 200:
+        if response.status_code == 200 or response.status_code == 201:
             return response.json()
         
         logging.warning(f"Moderation status failed for {user_id}/{channel_id}: {response.text}")
@@ -536,7 +555,7 @@ def resolve_get_user_moderation_status(obj, resolve_info: GraphQLResolveInfo, us
         url = f"{base_moderation_service_url}/admin/users/{user_id}/status?channel_id={channel_id}" 
         response = requests.get(url, headers=headers, timeout=5)
 
-        if response.status_code == 200:
+        if response.status_code == 200 or response.status_code == 201:
             data = response.json()
             
             data['user_id'] = user_id
@@ -574,7 +593,7 @@ def resolve_get_user_violations(obj, resolve_info: GraphQLResolveInfo, user_id, 
         # Aquí deberías agregar headers = {"X-API-Key": "YOUR_ADMIN_KEY"}
         response = requests.get(url, headers=headers, timeout=5) 
 
-        if response.status_code == 200:
+        if response.status_code == 200 or response.status_code == 201:
             data = response.json()
             data['user_id'] = user_id
             data['channel_id'] = channel_id
@@ -602,7 +621,7 @@ def resolve_get_channel_stats(obj, resolve_info: GraphQLResolveInfo, channelId):
         # Aquí se asume la autenticación de administrador (ej: X-API-Key)
         response = requests.get(url, headers=headers, timeout=5) 
 
-        if response.status_code == 200:
+        if response.status_code == 200 or response.status_code == 201:
             data = response.json()
             data['channel_id'] = channelId
             
