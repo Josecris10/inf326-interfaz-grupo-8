@@ -9,6 +9,7 @@ services:
       - SEARCH_SERVICE_BASE=https://searchservice.inf326.nursoft.dev
       - CHANNEL_SERVICE_BASE=https://channel-api.inf326.nur.dev/v1/channels
       - MESSAGE_SERVICE_BASE=https://messages-service.kroder.dev
+      - MODERATION_ADMIN_KEY=your-admin-api-key-change-in-production
     network_mode: "host"
 
 networks:
