@@ -731,4 +731,10 @@ schema = make_executable_schema(
     channel_stats,
     user_moderation_full_status
 )
-app = CORSMiddleware(GraphQL(schema, debug=True), allow_origins=['*'], allow_methods=("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"))
+app = CORSMiddleware(
+    GraphQL(schema, debug=True),
+    allow_origins=['*'],
+    allow_credentials=True,
+    allow_methods=("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"),
+    allow_headers=["*"],   # <-- ESTA ES LA CLAVE
+)
