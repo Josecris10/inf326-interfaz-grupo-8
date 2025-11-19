@@ -1,0 +1,35 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: grupo8-api-gateway-ingress
+spec:
+  tls:
+  - hosts:
+    - grupo8apigateway.inf326.nursoft.dev
+    secretName: grupo8-api-gateway-tls
+  ingressClassName: nginx
+  rules:
+  - host: grupo8apigateway.inf326.nursoft.dev
+    http:
+      paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: grupo8-api-gateway
+              port:
+                number: 5000
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: grupo8-api-gateway-certificate
+spec:
+  secretName: grupo8-api-gateway-tls
+  dnsNames:
+  - grupo8apigateway.inf326.nursoft.dev
+  issuerRef:
+    name: letsencrypt-issuer
+    # We can reference ClusterIssuers by changing the kind here.
+    # The default value is Issuer (i.e. a locally namespaced Issuer)
+    kind: Issuer
