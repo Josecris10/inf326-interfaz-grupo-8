@@ -14,6 +14,7 @@ import { FiSend } from "react-icons/fi";
 import { RiRobot3Line } from "react-icons/ri";
 import { useNavigate } from "react-router-dom";
 import type { ChatMessage } from "@/types/wiki.chatbot";
+import { getMessageWikipediaChatbot } from "@/services/wiki_chatbot_service";
 
 export default function WikiChatBot() {
 	const navigate = useNavigate();
@@ -35,7 +36,7 @@ export default function WikiChatBot() {
 		}
 	}, [messages]);
 
-	const handleSend = () => {
+	const handleSend = async () => {
 		const text = input.trim();
 		if (!text) return;
 
@@ -47,14 +48,23 @@ export default function WikiChatBot() {
 
 		setMessages((prev) => [...prev, newMessage]);
 		setInput("");
+		let res = "";
 
+		try {
+			const msgRes = await getMessageWikipediaChatbot(text);
+			res = msgRes.message;
+		} catch (error) {
+			res = 'Ocurrió un error inesperado, intenta mas tarde';
+			console.log(error);
+		}
+		
 		setTimeout(() => {
 			setMessages((prev) => [
 				...prev,
 				{
 					id: Date.now() + 1,
 					sender: "bot",
-					content: `Interesante pregunta. "${text}"\nAún no estoy conectado al backend, pero pronto te responderé mejor 😄`,
+					content: res,
 				},
 			]);
 		}, 600);

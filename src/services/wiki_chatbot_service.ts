@@ -7,12 +7,12 @@ const GRAPHQL_PATH = "";
 //  Definiciones de tipos de las respuestas GraphQL (data)
 // ===================================================================
 
-export interface PrograChatbotReply {
+export interface WikipediaChatbotReply {
     message: string;
 }
 
-type GetMessagePrograChatbot = {
-    getMessagePrograChatbot: PrograChatbotReply;
+type GetMessageWikipediaChatbot = {
+    getMessageWikipediaChatbot: WikipediaChatbotReply;
 }
 
 // ===================================================================
@@ -20,25 +20,25 @@ type GetMessagePrograChatbot = {
 // ===================================================================
 
 const GET_MESSAGE_QUERY = /* GraphQL */ `
-    query GetMessagePrograChatbot($message: String!) {
-        getMessagePrograChatbot(message: $message) {
-            reply
+    query GetMessageWikipediaChatbot($message: String!) {
+        getMessageWikipediaChatbot(message: $message) {
+            message
         }
     }
 `;
 
 //============================== Funciones de Servicio ==============================
 
-export async function getMessagePrograChatbot(
+export async function getMessageWikipediaChatbot(
     message: string
-): Promise<PrograChatbotReply> {
+): Promise<WikipediaChatbotReply> {
 
-    const data = await gqlQuery<GetMessagePrograChatbot>(
+    const data = await gqlQuery<GetMessageWikipediaChatbot>(
         API_URL,
         GRAPHQL_PATH,
         GET_MESSAGE_QUERY,
         { message }
     );
 
-    return data.getMessagePrograChatbot; // ← CORRECTO
+    return data.getMessageWikipediaChatbot; // ← CORRECTO
 }
