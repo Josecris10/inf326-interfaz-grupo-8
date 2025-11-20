@@ -1,4 +1,4 @@
-import type { Channel } from "../types/channel";
+import type { Channel, ChannelMember } from "../types/channel";
 import { gqlQuery } from "./common";
 
 const API_URL = import.meta.env.VITE_API_GATEWAY_URL;
@@ -12,6 +12,7 @@ export interface CreateChannelPayload {
 	name: string;
 	channel_type: string;
 	owner_id: string;
+	users: ChannelMember[];
 }
 
 export interface UpdateChannelPayload {
@@ -69,13 +70,15 @@ const CREATE_CHANNEL_MUTATION = /* GraphQL */ `
 		$name: String!
 		$channel_type: ChannelType!
 		$owner_id: String!
+		$users: [ChannelMemberInput!]!
 	) {
 		createChannel(
 			name: $name
 			channel_type: $channel_type
 			owner_id: $owner_id
+			users: $users
 		) {
-			id 
+			id
 			name
 			channel_type
 			owner_id
@@ -85,7 +88,6 @@ const CREATE_CHANNEL_MUTATION = /* GraphQL */ `
 			users {
 				id
 				joined_at
-				status
 			}
 		}
 	}
@@ -159,6 +161,7 @@ export async function createChannel(payload: CreateChannelPayload): Promise<Chan
 			name: payload.name,
 			channel_type: payload.channel_type,
 			owner_id: payload.owner_id,
+			users: payload.users,
 		}
 	);
 

@@ -214,11 +214,12 @@ async def resolve_get_channels(obj, resolve_info: GraphQLResolveInfo):
 	raise GraphQLError(f"Unexpected error occured: {response.text}")
 
 @mutation.field("createChannel")
-def resolve_create_channel(obj, resolve_info: GraphQLResolveInfo, name, channel_type, owner_id):
+def resolve_create_channel(obj, resolve_info: GraphQLResolveInfo, name, channel_type, owner_id, users):
 	payload = dict(
 		name=name,
 		channel_type=channel_type,
-		owner_id=owner_id
+		owner_id=owner_id,
+		users=users
 	)
 
 	response = requests.post(base_channel_service_url, json=payload)

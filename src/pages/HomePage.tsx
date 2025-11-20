@@ -127,6 +127,7 @@ export default function HomePage() {
 				name,
 				channel_type: newType.toUpperCase(),
 				owner_id: String(userId),
+				users: []
 			});
 
 			setChannels((prev) => [...prev, newChannel]);
