@@ -27,8 +27,8 @@ type MessagesPage {
 
 
 enum ChannelType {
-    PUBLIC
-    PRIVATE
+    public
+    private
 }
 
 type ChannelMember {
