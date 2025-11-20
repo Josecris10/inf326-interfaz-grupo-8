@@ -46,8 +46,8 @@ logging.basicConfig(level=logging.DEBUG,
 ADMIN_API_KEY = os.getenv("MODERATION_ADMIN_KEY", None)
 base_user_service_url = "https://users.inf326.nursoft.dev/v1"
 base_channel_service_url = "https://channel-api.inf326.nur.dev/v1/channels"
-base_message_service_url = os.getenv("MESSAGE_SERVICE_BASE", "http://messages-service.nursoft.dev")
-SEARCH_SERVICE_BASE = os.getenv("SEARCH_SERVICE_BASE", "http://searchservice.inf326.nursoft.devc")
+base_message_service_url = os.getenv("MESSAGE_SERVICE_BASE", "https://messages-service.nursoft.dev")
+SEARCH_SERVICE_BASE = os.getenv("SEARCH_SERVICE_BASE", "https://searchservice.inf326.nursoft.dev")
 
 base_progra_chatbot_service_url = "https://chatbotprogra.inf326.nursoft.dev/chat"
 base_moderation_service_url = "https://moderation.inf326.nur.dev/api/v1"
