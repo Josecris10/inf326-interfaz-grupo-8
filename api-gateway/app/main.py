@@ -252,14 +252,13 @@ def resolve_reactivate_channel(obj, resolve_info: GraphQLResolveInfo, channel_id
 	raise GraphQLError(f"Channel reactivation failed: {response.text}")
 
 @mutation.field("deleteChannel")
-def resolve_delete_channel(obj, resolve_info: GraphQLResolveInfo, channel_id):
-	
-	response = requests.delete(base_channel_service_url+f"/{channel_id}")
-
-	if response.status_code == 200 or response.status_code == 201:
-		return response.json()
-
-	raise GraphQLError(f"Channel elimination failed: {response.text}")
+def resolve_delete_channel(obj, info, channel_id):
+	url = f"{base_channel_service_url}/v1/channels/{channel_id}"
+	response = requests.delete(url)
+	if response.status_code == 200 or response.status_code == 204:
+		data = response.json()
+		return data['id']
+	raise GraphQLError(f"Error al borrar canal: {response.text}")
 
 
 # ----------------------------------------------     MESSAGE-SERVICE   ------------------------------------------------------------

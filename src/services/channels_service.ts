@@ -39,7 +39,7 @@ type ReactivateChannelData = {
 };
 
 type DeleteChannelData = {
-	deleteChannel: Channel;
+	deleteChannel: string;
 };
 
 // ===================================================================
@@ -128,14 +128,8 @@ const REACTIVATE_CHANNEL_MUTATION = /* GraphQL */ `
 `;
 
 const DELETE_CHANNEL_MUTATION = /* GraphQL */ `
-	mutation DeleteChannel($channel_id: Int!) {
-		deleteChannel(channel_id: $channel_id) {
-			id
-			name
-			owner_id
-			channel_type
-			users
-		}
+	mutation DeleteChannel($channel_id: ID!) {
+		deleteChannel(channel_id: $channel_id)
 	}
 `;
 
@@ -195,7 +189,7 @@ export async function reactivateChannel(channel_id: number): Promise<Channel> {
 	return data.reactivateChannel;
 }
 
-export async function deleteChannel(channel_id: number): Promise<Channel> {
+export async function deleteChannel(channel_id: string): Promise<string> {
 	const data = await gqlQuery<DeleteChannelData>(
 		API_URL,
 		GRAPHQL_PATH,

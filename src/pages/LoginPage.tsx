@@ -10,8 +10,8 @@ import {
 } from "@chakra-ui/react";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 import AuthLayout from "../components/auth/AuthLayout";
-import { loginUser } from "../services/users_service";
-import { setAuthToken } from "../services/storage";
+import { getCurrentUserWithToken, loginUser } from "../services/users_service";
+import { setAuthToken, setFullName, setTokenType, setUserID, setUsername } from "../services/storage";
 
 export default function LoginPage() {
 	const [email, setEmail] = useState("");
@@ -27,6 +27,17 @@ export default function LoginPage() {
 				password
 			})
 			setAuthToken(tokenRes.access_token)
+			setTokenType(tokenRes.token_type)
+			try {
+				const userRes = await getCurrentUserWithToken(tokenRes.access_token);
+				setUserID(userRes.id);
+				setEmail(userRes.email);
+				setUsername(userRes.username);
+				if (userRes.full_name !== null) setFullName(userRes.full_name);
+			} catch (error) {
+				console.log(error)
+				alert("Problemas al obtener la información del usuario.")
+			}
 			navigate("/home");
 		} catch (error) {
 			console.log(error);

@@ -7,7 +7,7 @@ export type ChannelMember = {
 };
 
 export type Channel = {
-	id: number;
+	id: string;
 	channel_type: ChannelType;
 	created_at: number;
 	is_active: boolean;

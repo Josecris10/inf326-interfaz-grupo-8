@@ -18,7 +18,7 @@ import { MOCK_THREADS } from "../data/mock_threads";
 import type { Channel } from "../types/channel";
 import type { Thread } from "../types/thread";
 import { createThread } from "../services/threads_service";
-import { getChannelById } from "../services/channels_service";
+import { getChannelById, deleteChannel } from "../services/channels_service";
 
 export default function ChannelPage() {
 	const [qSearch, setQSearch] = useState("");
@@ -27,7 +27,7 @@ export default function ChannelPage() {
 	const [tSearch, setTSearch] = useState("");
 	const [filteredThreads, setFilteredThreads] = useState<Thread[]>(MOCK_THREADS);
 
-	const userId = 1;
+	const [isDeleting, setIsDeleting] = useState(false);
 	const [newTitle, setNewTitle] = useState("");
 	const [newContent, setNewContent] = useState("");
 	const [newCategory, setNewCategory] = useState("");
@@ -145,7 +145,7 @@ export default function ChannelPage() {
 				channel_id: String(channel.id),
 				title,
 				content,
-				author_id: userId,
+				author_id: 14,
 				category: category || "general",
 				tags: tags || "",
 			});
@@ -163,6 +163,27 @@ export default function ChannelPage() {
 			);
 		} finally {
 			setIsCreating(false);
+		}
+	};
+
+	const handleDeleteChannel = async () => {
+		if (!channel) return;
+
+		const confirmed = window.confirm(`¿Estás seguro de que quieres eliminar el canal "${channel.name}"?`);
+		if (!confirmed) return;
+
+		try {
+			setIsDeleting(true);
+			
+			console.log(channel.id)
+			await deleteChannel(channel.id);
+			
+			navigate("/home");
+		} catch (error) {
+			console.error("Error al eliminar el canal:", error);
+			alert("Hubo un error al intentar eliminar el canal.");
+		} finally {
+			setIsDeleting(false);
 		}
 	};
 
@@ -187,20 +208,39 @@ export default function ChannelPage() {
 							</Text>
 						</Stack>
 
-						<Button
-							aria-label="Buscar"
-							variant="outline"
-							p={2}
-							bg="#004B85"
-							color="#fff"
-							_hover={{
-								bg: "#fff",
-								color: "#004B85",
-							}}
-							onClick={() => navigate("/home")}
-						>
-							<Text fontSize={"lg"}>Volver</Text>
-						</Button>
+						<HStack gap={3}>
+							<Button
+								aria-label="Eliminar Canal"
+								variant="outline"
+								p={2}
+								bg="#D60019"
+								color="#fff"
+								loading={isDeleting}
+								loadingText="Borrando"
+								_hover={{
+									bg: "#fff",
+									color: "#D60019",
+								}}
+								onClick={handleDeleteChannel}
+							>
+								<Text fontSize={"lg"}>Eliminar</Text>
+							</Button>
+
+							<Button
+								aria-label="Buscar"
+								variant="outline"
+								p={2}
+								bg="#004B85"
+								color="#fff"
+								_hover={{
+									bg: "#fff",
+									color: "#004B85",
+								}}
+								onClick={() => navigate("/home")}
+							>
+								<Text fontSize={"lg"}>Volver</Text>
+							</Button>
+						</HStack>
 					</Flex>
 				</Container>
 			</Box>

@@ -1,11 +1,14 @@
 import { getAuthToken } from "./storage";
 
-function authHeaders(extra: Record<string, string> = {}) {
+function authHeaders(
+	extra: Record<string, string> = {},
+	tokenType: string = "Bearer"
+) {
 	const token = getAuthToken();
 
 	return {
 		"Content-Type": "application/json",
-		...(token ? { Authorization: `${token}` } : {}),
+		...(token ? { Authorization: `${tokenType} ${token}`.trim() } : {}),
 		...extra,
 	};
 }

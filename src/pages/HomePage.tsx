@@ -21,15 +21,12 @@ import { FaLaptopCode } from "react-icons/fa";
 import { FaTools } from "react-icons/fa";
 import { FaWikipediaW } from "react-icons/fa";
 
-//import { MOCK_CHANNELS } from "../data/mock_channels";
 import { searchChannel } from "../services/search_service";
 import type { Channel, ChannelType } from "../types/channel";
 import { createChannel } from "../services/channels_service";
+import { getUserID } from "@/services/storage";
 
 export default function HomePage() {
-	//const [channels, setChannels] = useState<Channel[]>(MOCK_CHANNELS);
-
-	const userId = 1;
 	const [newName, setNewName] = useState("");
 	const [newType, setNewType] = useState<"public" | "private">("public");
 	const [isCreating, setIsCreating] = useState(false);
@@ -53,11 +50,8 @@ export default function HomePage() {
 				setFilteredChannels([]);
 			}
 		}
-
 		fetchAll();
 	}, []);
-
-
 
 	const handleChannelClick = (channel: Channel) => {
 		navigate(`/channels/${channel.id}`, { state: { channel } });
@@ -66,20 +60,18 @@ export default function HomePage() {
 	const handleSearchClick = async () => {
 		const params: Record<string, string | number | boolean> = {};
 
-		// Búsqueda libre
 		const q = search.trim();
 		if (q) params.q = q;
 
-		// Filtros
 		if (channelType) params.channel_type = channelType.toLowerCase();
 		if (isActive) params.is_active = isActive === "true";
 
-		// Paginación automática
 		params.limit = 50;
 		params.offset = 0;
 
 		try {
 			const result = await searchChannel(params);
+			console.log(result);
 			setFilteredChannels(result);
 		} catch (err) {
 			console.error("Error al buscar canales:", err);
@@ -99,12 +91,14 @@ export default function HomePage() {
 		try {
 			setIsCreating(true);
 
-			await createChannel({
+			const createdChannel = await createChannel({
 				name,
 				channel_type: newType.toLowerCase() as ChannelType,
-				owner_id: String(userId),
+				owner_id: String(getUserID()),
 				users: []
 			});
+
+			setFilteredChannels((prevChannels) => [...prevChannels, createdChannel]);
 
 			setNewName("");
 			setNewType("public");
@@ -119,7 +113,6 @@ export default function HomePage() {
 
 	return (
 		<Box minH="100vh" bg="bg.subtle">
-			{/* Navbar tipo Reddit */}
 			<Flex
 				as="header"
 				px={6}
@@ -140,7 +133,6 @@ export default function HomePage() {
 				</HStack>
 
 				<HStack flex="1" ml={8} gap={2} w="full">
-					{/* 1. INPUT DE BÚSQUEDA */}
 					<Input
 						placeholder="Buscar por palabra clave..."
 						value={search}
@@ -150,24 +142,22 @@ export default function HomePage() {
 						flex="1"
 					/>
 
-					{/* 2. SELECTOR DE TIPO (Usando NativeSelect de Chakra v3) */}
 					<Box width="160px">
 						<NativeSelect.Root variant="outline" size="md">
 							<NativeSelect.Field
 								bg="bg.subtle"
 								placeholder="Tipo: Todos"
 								value={channelType}
-								// Tipamos el evento 'e' para corregir el error TS
 								onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setChannelType(e.target.value)}
 							>
 								<option value="public">Público</option>
 								<option value="private">Privado</option>
 							</NativeSelect.Field>
+
 							<NativeSelect.Indicator />
 						</NativeSelect.Root>
 					</Box>
 
-					{/* 3. SELECTOR DE ESTADO */}
 					<Box width="160px">
 						<NativeSelect.Root variant="outline" size="md">
 							<NativeSelect.Field
@@ -179,11 +169,11 @@ export default function HomePage() {
 								<option value="true">Activo</option>
 								<option value="false">Inactivo</option>
 							</NativeSelect.Field>
+
 							<NativeSelect.Indicator />
 						</NativeSelect.Root>
 					</Box>
 
-					{/* 4. BOTÓN DE BÚSQUEDA */}
 					<Button
 						aria-label="Buscar"
 						variant={"outline"}
@@ -208,6 +198,7 @@ export default function HomePage() {
 					>
 						<FaBook />
 					</Button>
+
 					<Button
 						aria-label="Calculadora"
 						variant="outline"
@@ -218,6 +209,7 @@ export default function HomePage() {
 					>
 						<FaCalculator />
 					</Button>
+
 					<Button
 						aria-label="Programacion"
 						variant="outline"
@@ -228,6 +220,7 @@ export default function HomePage() {
 					>
 						<FaLaptopCode />
 					</Button>
+
 					<Button
 						aria-label="Utilidad"
 						variant="outline"
@@ -238,6 +231,7 @@ export default function HomePage() {
 					>
 						<FaTools />
 					</Button>
+
 					<Button
 						aria-label="Wikipedia"
 						variant="outline"
@@ -249,6 +243,7 @@ export default function HomePage() {
 						<FaWikipediaW />
 					</Button>
 				</HStack>
+
 				<Button
 					aria-label="Cerrar Sesión"
 					variant="outline"
@@ -267,9 +262,7 @@ export default function HomePage() {
 				</Button>
 			</Flex>
 
-			{/* Contenido central con lista de canales */}
 			<Container maxW="4xl" py={8}>
-				{/* Sección para crear un canal */}
 				<Box
 					bg="bg.surface"
 					borderRadius="lg"
@@ -300,7 +293,6 @@ export default function HomePage() {
 							<Text fontSize="sm" mb={1}>
 								Tipo de canal
 							</Text>
-							{/* select nativo HTML para evitar problemas con Chakra Select */}
 							<select
 								value={newType}
 								onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
@@ -336,7 +328,6 @@ export default function HomePage() {
 					</Stack>
 				</Box>
 
-				{/* Lista tipo Reddit */}
 				<Stack gap={4}>
 					{filteredChannels?.length === 0 && (
 						<Box
@@ -377,6 +368,7 @@ export default function HomePage() {
 									<Heading size="sm">
 										{channel.name}
 									</Heading>
+
 									<Badge
 										bg={channel.channel_type.toLowerCase() === "public" ? "grey" : "yellow.500"}
 										color="white"
@@ -406,9 +398,6 @@ export default function HomePage() {
 								<Text>
 									{channel.users.length} usuarios
 								</Text>
-								{/* <Text>
-									{channel.threads.length} hilos
-								</Text> */}
 							</HStack>
 						</Box>
 					))}
