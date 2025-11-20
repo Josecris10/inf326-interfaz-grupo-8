@@ -23,7 +23,7 @@ import { FaWikipediaW } from "react-icons/fa";
 
 //import { MOCK_CHANNELS } from "../data/mock_channels";
 import { searchChannel } from "../services/search_service";
-import type { Channel } from "../types/channel";
+import type { Channel, ChannelType } from "../types/channel";
 import { createChannel } from "../services/channels_service";
 
 export default function HomePage() {
@@ -125,7 +125,7 @@ export default function HomePage() {
 
 			const newChannel = await createChannel({
 				name,
-				channel_type: newType.toUpperCase(),
+				channel_type: newType.toLowerCase() as ChannelType,
 				owner_id: String(userId),
 				users: []
 			});

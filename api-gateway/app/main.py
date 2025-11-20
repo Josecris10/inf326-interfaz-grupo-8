@@ -217,7 +217,7 @@ async def resolve_get_channels(obj, resolve_info: GraphQLResolveInfo):
 def resolve_create_channel(obj, resolve_info: GraphQLResolveInfo, name, channel_type, owner_id, users):
 	payload = dict(
 		name=name,
-		channel_type=channel_type,
+		channel_type=channel_type.lower(),
 		owner_id=owner_id,
 		users=users
 	)

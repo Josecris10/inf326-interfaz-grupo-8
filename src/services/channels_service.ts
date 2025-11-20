@@ -1,4 +1,4 @@
-import type { Channel, ChannelMember } from "../types/channel";
+import type { Channel, ChannelMember, ChannelType } from "../types/channel";
 import { gqlQuery } from "./common";
 
 const API_URL = import.meta.env.VITE_API_GATEWAY_URL;
@@ -10,7 +10,7 @@ const GRAPHQL_PATH = "";
 
 export interface CreateChannelPayload {
 	name: string;
-	channel_type: string;
+	channel_type: ChannelType;
 	owner_id: string;
 	users: ChannelMember[];
 }
@@ -19,7 +19,7 @@ export interface UpdateChannelPayload {
 	channel_id: number;
 	name: string;
 	owner_id: number;
-	channel_type: string;
+	channel_type: ChannelType;
 }
 
 type GetChannelData = {
