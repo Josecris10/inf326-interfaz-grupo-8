@@ -253,7 +253,7 @@ def resolve_reactivate_channel(obj, resolve_info: GraphQLResolveInfo, channel_id
 
 @mutation.field("deleteChannel")
 def resolve_delete_channel(obj, info, channel_id):
-	url = f"{base_channel_service_url}/v1/channels/{channel_id}"
+	url = f"{base_channel_service_url}/{channel_id}"
 	response = requests.delete(url)
 	if response.status_code == 200 or response.status_code == 204:
 		data = response.json()

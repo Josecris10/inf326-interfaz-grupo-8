@@ -175,6 +175,7 @@ export default function ChannelPage() {
 		try {
 			setIsDeleting(true);
 			
+			console.log(channel)
 			console.log(channel.id)
 			await deleteChannel(channel.id);
 			
