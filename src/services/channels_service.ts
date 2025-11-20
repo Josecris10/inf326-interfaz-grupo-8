@@ -10,7 +10,7 @@ const GRAPHQL_PATH = "";
 
 export interface CreateChannelPayload {
 	name: string;
-	owner_id: number;
+	owner_id: string;
 	users: number[];
 	channel_type: string;
 }
@@ -68,9 +68,9 @@ const GET_CHANNEL_QUERY = /* GraphQL */ `
 const CREATE_CHANNEL_MUTATION = /* GraphQL */ `
 	mutation CreateChannel(
 		$name: String!
-		$owner_id: Int!
-		$users: [Int!]!
-		$channel_type: String!
+		$owner_id: String!
+		$users: [ChannelMemberInput!]!
+		$channel_type: ChannelType!
 	) {
 		createChannel(
 			name: $name
@@ -82,10 +82,13 @@ const CREATE_CHANNEL_MUTATION = /* GraphQL */ `
 			name
 			owner_id
 			channel_type
-			users
+			users {
+				id
+				joined_at
+			}
 		}
 	}
-`;
+`
 
 const UPDATE_CHANNEL_MUTATION = /* GraphQL */ `
 	mutation UpdateChannel(

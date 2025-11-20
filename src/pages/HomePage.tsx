@@ -62,20 +62,20 @@ export default function HomePage() {
 	// }, [channels, search]);
 
 	useEffect(() => {
-    async function fetchAll() {
-        try {
-            const all = await searchChannel(undefined); // sin query, devuelve todos
-            setChannels(all);
-            setFilteredChannels(all); // inicialmente mostramos todo
-        } catch (err) {
-            console.error("Error al cargar canales:", err);
-            setChannels([]);
-            setFilteredChannels([]);
-        }
-    }
+		async function fetchAll() {
+			try {
+				const all = await searchChannel(undefined);
+				setChannels(all);
+				setFilteredChannels(all);
+			} catch (err) {
+				console.error("Error al cargar canales:", err);
+				setChannels([]);
+				setFilteredChannels([]);
+			}
+		}
 
-    fetchAll();
-}, []);
+		fetchAll();
+	}, []);
 
 
 
@@ -125,7 +125,7 @@ export default function HomePage() {
 
 			const newChannel = await createChannel({
 				name,
-				owner_id: userId,
+				owner_id: String(userId),
 				users: [],
 				channel_type: newType.toUpperCase(),
 			});
@@ -254,15 +254,6 @@ export default function HomePage() {
 						</Box>
 					)}
 				</Box>
-
-			
-
-
-
-
-					
-					
-
 				<HStack maxW="sm" flex="1" ml={8} gap={2}>
 					<Button
 						aria-label="Academico"
@@ -315,7 +306,6 @@ export default function HomePage() {
 						<FaWikipediaW />
 					</Button>
 				</HStack>
-
 				<Button
 					aria-label="Cerrar Sesión"
 					variant="outline"
