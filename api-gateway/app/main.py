@@ -222,7 +222,7 @@ def resolve_create_channel(obj, resolve_info: GraphQLResolveInfo, name, channel_
 		users=users
 	)
 
-	response = requests.post(base_channel_service_url, json=payload)
+	response = requests.post(base_channel_service_url + "/", json=payload)
 
 	if response.status_code == 200 or response.status_code == 201:
 		return response.json()
