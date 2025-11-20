@@ -364,7 +364,7 @@ def resolve_search_channels(obj, resolve_info: GraphQLResolveInfo,
 				if isinstance(ch, dict):
 					ct = ch.get("channel_type")
 					if ct:
-						ch["channel_type"] = ct.upper()
+						ch["channel_type"] = ct.lower()
 				normalized.append(ch)
 
 			return normalized
