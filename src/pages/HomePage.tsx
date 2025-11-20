@@ -91,7 +91,7 @@ export default function HomePage() {
 		if (q) params.q = q;
 
 		// Filtros
-		if (channelType) params.channel_type = channelType.toUpperCase();
+		if (channelType) params.channel_type = channelType.toLowerCase();
 		if (isActive) params.is_active = isActive === "true";
 
 		// Paginación automática
@@ -106,10 +106,6 @@ export default function HomePage() {
 			setFilteredChannels([]);
 		}
 	};
-
-
-
-
 
 	const handleCreateChannel = async () => {
 		const name = newName.trim();
@@ -163,7 +159,7 @@ export default function HomePage() {
 						INF326 Community
 					</Heading>
 				</HStack>
-
+				
 				<HStack maxW="lg" flex="1" ml={8} gap={2}>
 					<Input
 						placeholder="Buscar por palabra clave..."

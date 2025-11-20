@@ -356,7 +356,7 @@ def resolve_search_channels(obj, resolve_info: GraphQLResolveInfo,
 			params=params if params else None,
 			timeout=5
 		)
-		if response.status_code == 200 or response.status_code == 201:
+		if resp.status_code == 200 or resp.status_code == 201:
 			data = resp.json()
 			normalized = []
 			for ch in data:
