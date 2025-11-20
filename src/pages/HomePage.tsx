@@ -14,7 +14,7 @@ import {
 	Text,
 } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
-import { FiSearch, FiSliders } from "react-icons/fi";
+import { FiSearch } from "react-icons/fi";
 import { FaBook } from "react-icons/fa";
 import { FaCalculator } from "react-icons/fa";
 import { FaLaptopCode } from "react-icons/fa";
@@ -37,39 +37,19 @@ export default function HomePage() {
 
 	const navigate = useNavigate();
 	
-	const [_, setChannels] = useState<Channel[]>([]);
 	const [filteredChannels, setFilteredChannels] = useState<Channel[]>([]);
 	const [search, setSearch] = useState("");
 
-	const [showAdvanced, setShowAdvanced] = useState(false);
 	const [channelType, setChannelType] = useState("");
 	const [isActive, setIsActive] = useState("");
-	
-	
-	// const channels = useMemo(() => MOCK_CHANNELS, []);
-
-	// const filteredChannels = useMemo(() => {
-	// 	let result = channels;
-
-	// 	const q = search.trim().toLowerCase();
-	// 	if (q) {
-	// 		result = result.filter((c) =>
-	// 			(c.name ?? "").toLowerCase().includes(q)
-	// 		);
-	// 	}
-
-	// 	return result;
-	// }, [channels, search]);
 
 	useEffect(() => {
 		async function fetchAll() {
 			try {
 				const all = await searchChannel(undefined);
-				setChannels(all);
 				setFilteredChannels(all);
 			} catch (err) {
 				console.error("Error al cargar canales:", err);
-				setChannels([]);
 				setFilteredChannels([]);
 			}
 		}
@@ -84,7 +64,7 @@ export default function HomePage() {
 	};
 
 	const handleSearchClick = async () => {
-		const params: any = {};
+		const params: Record<string, string | number | boolean> = {};
 
 		// Búsqueda libre
 		const q = search.trim();
@@ -119,14 +99,13 @@ export default function HomePage() {
 		try {
 			setIsCreating(true);
 
-			const newChannel = await createChannel({
+			await createChannel({
 				name,
 				channel_type: newType.toLowerCase() as ChannelType,
 				owner_id: String(userId),
 				users: []
 			});
 
-			setChannels((prev) => [...prev, newChannel]);
 			setNewName("");
 			setNewType("public");
 		} catch (err) {
@@ -159,97 +138,65 @@ export default function HomePage() {
 						INF326 Community
 					</Heading>
 				</HStack>
-				
-				<HStack maxW="lg" flex="1" ml={8} gap={2}>
+
+				<HStack flex="1" ml={8} gap={2} w="full">
+					{/* 1. INPUT DE BÚSQUEDA */}
 					<Input
 						placeholder="Buscar por palabra clave..."
 						value={search}
-						onChange={(e) => setSearch(e.target.value)}
+						// Tipamos el evento 'e'
+						onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value)}
 						bg="bg.subtle"
+						flex="1"
 					/>
 
+					{/* 2. SELECTOR DE TIPO (Usando NativeSelect de Chakra v3) */}
+					<Box width="160px">
+						<NativeSelect.Root variant="outline" size="md">
+							<NativeSelect.Field
+								bg="bg.subtle"
+								placeholder="Tipo: Todos"
+								value={channelType}
+								// Tipamos el evento 'e' para corregir el error TS
+								onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setChannelType(e.target.value)}
+							>
+								<option value="public">Público</option>
+								<option value="private">Privado</option>
+							</NativeSelect.Field>
+							<NativeSelect.Indicator />
+						</NativeSelect.Root>
+					</Box>
+
+					{/* 3. SELECTOR DE ESTADO */}
+					<Box width="160px">
+						<NativeSelect.Root variant="outline" size="md">
+							<NativeSelect.Field
+								bg="bg.subtle"
+								placeholder="Estado: Todos"
+								value={isActive}
+								onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setIsActive(e.target.value)}
+							>
+								<option value="true">Activo</option>
+								<option value="false">Inactivo</option>
+							</NativeSelect.Field>
+							<NativeSelect.Indicator />
+						</NativeSelect.Root>
+					</Box>
+
+					{/* 4. BOTÓN DE BÚSQUEDA */}
 					<Button
 						aria-label="Buscar"
-						variant="outline"
-						p={2}
+						variant={"outline"}
 						bg="#004B85"
-						color="#fff"
+						color="white"
+						_hover={{ bg: "#003B65" }}
 						onClick={handleSearchClick}
+						px={3}
 					>
 						<FiSearch />
 					</Button>
 				</HStack>
 
-				<Box position="relative">
-					<Button
-						size="sm"
-						variant="outline"
-						bg="#004B85"
-						color="#fff"
-						onClick={() => setShowAdvanced(!showAdvanced)}
-					>
-						<HStack gap={2}>
-							<FiSliders />
-							<Text>Filtros</Text>
-							{(channelType || isActive) && (
-								<Badge colorScheme="green" borderRadius="full">●</Badge>
-							)}
-						</HStack>
-					</Button>
-
-					{showAdvanced && (
-						<Box
-							position="absolute"
-							top="110%"
-							right="0"
-							w="260px"
-							p={4}
-							bg="white"
-							borderRadius="md"
-							borderWidth="1px"
-							borderColor="gray.200"
-							boxShadow="xl"
-							zIndex={9999}
-						>
-							{/* filtros */}
-							<Stack gap={2}>
-								{/* TIPO */}
-								<Box>
-									<Text fontSize="sm" mb={1} fontWeight="medium">
-										Tipo
-									</Text>
-									<NativeSelect.Root bg="white" size="sm" borderRadius="md">
-										<NativeSelect.Field
-											value={channelType}
-											onChange={(e) => setChannelType(e.target.value)}
-										>
-											<option value="">Todos</option>
-											<option value="public">Público</option>
-											<option value="private">Privado</option>
-										</NativeSelect.Field>
-									</NativeSelect.Root>
-								</Box>
-
-								{/* ESTADO */}
-								<Box>
-									<Text fontSize="sm" mb={1} fontWeight="medium">
-										Estado
-									</Text>
-									<NativeSelect.Root bg="white" size="sm" borderRadius="md">
-										<NativeSelect.Field
-											value={isActive}
-											onChange={(e) => setIsActive(e.target.value)}
-										>
-											<option value="">Todos</option>
-											<option value="true">Activo</option>
-											<option value="false">Inactivo</option>
-										</NativeSelect.Field>
-									</NativeSelect.Root>
-								</Box>
-							</Stack>
-						</Box>
-					)}
-				</Box>
 				<HStack maxW="sm" flex="1" ml={8} gap={2}>
 					<Button
 						aria-label="Academico"
@@ -389,7 +336,7 @@ export default function HomePage() {
 					</Stack>
 				</Box>
 
-                {/* Lista tipo Reddit */}
+				{/* Lista tipo Reddit */}
 				<Stack gap={4}>
 					{filteredChannels?.length === 0 && (
 						<Box
