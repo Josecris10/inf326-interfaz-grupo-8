@@ -125,9 +125,8 @@ export default function HomePage() {
 
 			const newChannel = await createChannel({
 				name,
-				owner_id: String(userId),
-				users: [],
 				channel_type: newType.toUpperCase(),
+				owner_id: String(userId),
 			});
 
 			setChannels((prev) => [...prev, newChannel]);
