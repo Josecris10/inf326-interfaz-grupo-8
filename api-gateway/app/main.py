@@ -461,8 +461,8 @@ def resolve_search_channels(obj, resolve_info: GraphQLResolveInfo,
 @query.field("searchThreads")
 def resolve_search_threads(obj, resolve_info: GraphQLResolveInfo,
 							thread_id=None, created_by=None,
-							category=None, keyword=None, 
-							status=None):
+							keyword=None, status=None,
+							start_date=None, end_date=None):
 	try:
 		if keyword:
 			resp = requests.get(f"{SEARCH_SERVICE_BASE}/api/threads/keyword/{keyword}", timeout=5)

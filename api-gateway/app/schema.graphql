@@ -246,10 +246,9 @@ extend type Query {
   # ChannelPage -> search threads within a channel using multiple optional filters.
  
   searchThreads(
-    channel_id: String
-    category: String
-    author: String
-    tag: String
+    thread_id: String
+    created_by: String
+    status: String
     keyword: String
     start_date: DateTime
     end_date: DateTime
