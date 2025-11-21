@@ -51,6 +51,7 @@ SEARCH_SERVICE_BASE = os.getenv("SEARCH_SERVICE_BASE", "https://searchservice.in
 
 base_progra_chatbot_service_url = "https://chatbotprogra.inf326.nursoft.dev/chat"
 base_moderation_service_url = "https://moderation.inf326.nur.dev/api/v1"
+base_thread_service_urL = "http://threads-service:80/v1/"
 
 # ESTAS URL DEBEN CAMBIARSE SI O SI, DEJE ESTAS DE MOMENTO PORQUE ES LA INFO QUE SE TIENE HASTA AHORA, PERO DEBEN
 # CAMBIARSE A LA ADAPTACIÓN EN EL CLUSTER
@@ -260,6 +261,91 @@ def resolve_delete_channel(obj, info, channel_id):
 		return data['id']
 	raise GraphQLError(f"Error al borrar canal: {response.text}")
 
+# ----------------------------------------------     THREAD-SERVICE   ------------------------------------------------------------
+
+@query.field("getThread")
+async def resolve_get_thread(obj, resolve_info: GraphQLResolveInfo, thread_id):
+	response = requests.get(base_thread_service_url+f"/{thread_id}")
+	if response.status_code == 200 or response.status_code == 201:
+		thread = response.json()
+
+		if "channel_type" in channel:
+			channel["channel_type"] = channel["channel_type"].upper()
+		
+		return thread
+
+	raise GraphQLError(f"Thread not found: {response.text}")
+
+@query.field("getThreads")
+async def resolve_get_threads(obj, resolve_info: GraphQLResolveInfo, channel_id):
+	text = ""
+
+	if channel_id:
+		text = f"?channel_id={channel_id}"
+
+	response = requests.get(base_thread_service_url+text)
+	if response.status_code == 200 or response.status_code == 201:
+		threads = response.json()
+
+		return threads
+
+	raise GraphQLError(f"Threads not found: {response.text}")
+
+@mutation.field("createThread")
+def resolve_create_thread(obj, resolve_info: GraphQLResolveInfo, channel_id, title, created_by, meta):
+	payload = dict(
+		channel_id=channel_id,
+		title=title,
+		created_by=created_by
+	)
+	
+	if meta:
+		payload["meta"] = meta
+
+	response = requests.post(base_thread_service_url, json=payload)
+
+	if response.status_code == 200 or response.status_code == 201:
+		return response.json()
+
+	raise GraphQLError(f"Thread creation failed: {response.text}")
+
+@mutation.field("updateThread")
+def resolve_update_thread(obj, resolve_info: GraphQLResolveInfo, thread_id, title, status, meta):
+	payload = dict()
+
+	if title:
+		payload["title"] = title
+
+	if status:
+		payload["status"] = status
+
+	if meta:
+		payload["meta"] = meta
+
+	response = requests.patch(base_thread_service_url+f"/{thread_id}", json=payload)
+
+	if response.status_code == 200 or response.status_code == 201:
+		return response.json()
+
+	raise GraphQLError(f"Thread update failed: {response.text}")
+
+@mutation.field("archiveThread")
+def resolve_archive_thread(obj, resolve_info: GraphQLResolveInfo, thread_id):
+	response = requests.post(base_thread_service_url+f"/{thread_id}:archive")
+
+	if response.status_code == 200 or response.status_code == 201:
+		return response.json()
+
+	raise GraphQLError(f"Thread archive failed: {response.text}")
+
+@mutation.field("deleteThread")
+def resolve_delete_channel(obj, info, thread_id):
+	url = f"{base_thread_service_url}/{thread_id}"
+	response = requests.delete(url)
+	if response.status_code == 200 or response.status_code == 204:
+		data = response.json()
+		return True
+	raise GraphQLError(f"Thread deletion failed: {response.text}")
 
 # ----------------------------------------------     MESSAGE-SERVICE   ------------------------------------------------------------
 

@@ -1,10 +1,10 @@
 scalar DateTime
+scalar JSON
 
 schema {
     query: Query
     mutation: Mutation
 }
-
 
 
 
@@ -168,11 +168,27 @@ type UpdateDeletePresenceReply {
     data: String
 }
 
+
+type Thread {
+    id: String!
+    channel_id: String!
+    title: String!
+    created_by: String!
+    status: String!
+    meta: JSON
+    created_at: DateTime!
+    updated_at: DateTime
+}
+
+
 type Query {
     getMessage(thread_id: String!, user_id: String!): MessagesPage!
 
     getChannels: [ChannelBasicInfo!]!
     getChannel(channel_id: String!): Channel!
+
+    getThread(thread_id: String!): Thread
+    getThreads(channel_id: String): [Thread]
 
     getUser(token: String!): User!
 
@@ -182,6 +198,7 @@ type Query {
     getPresence(statusEnum: StatusEnum): GetPresenceReply!
     getPresenceStats: GetPresenceStatsReply!
     getPresenceUser(userId: String!): GetPresenceUserReply!
+
 }
 
 type Mutation {
@@ -194,6 +211,11 @@ type Mutation {
     deleteChannel(channel_id: ID!): ID!
     reactivateChannel(channel_id: ID!): ID!
 
+    createThread(channel_id: String!, title: String!, created_by: String!, meta: JSON): Thread!
+    updateThread(thread_id: String!, title: String, status: String, meta: JSON): Thread!
+    archiveThread(thread_id: String!): Thread!
+    deleteThread(thread_id: String!): Boolean!
+
     createUser(email: String!, username: String!, password: String!, full_name: String): User!
     updateUser(full_name: String): User!
     loginUser(username_or_email: String!, password: String!): Token!
@@ -204,16 +226,7 @@ type Mutation {
 }
 
 
-type Thread {
-    id: ID!
-    title: String
-    author_id: ID
-    category: String
-    tags: [String]
-    content: String
-    created_at: DateTime
-    updated_at: DateTime
-}
+
 
 
 
