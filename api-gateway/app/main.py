@@ -460,22 +460,26 @@ def resolve_search_channels(obj, resolve_info: GraphQLResolveInfo,
 
 @query.field("searchThreads")
 def resolve_search_threads(obj, resolve_info: GraphQLResolveInfo,
-						   channel_id=None, category=None, author=None,
-						   tag=None, keyword=None, start_date=None, end_date=None):
+							thread_id=None, created_by=None,
+							category=None, keyword=None, 
+							status=None):
 	try:
 		if keyword:
 			resp = requests.get(f"{SEARCH_SERVICE_BASE}/api/threads/keyword/{keyword}", timeout=5)
-		elif tag:
-			resp = requests.get(f"{SEARCH_SERVICE_BASE}/api/threads/tag/{tag}", timeout=5)
-		elif author:
-			resp = requests.get(f"{SEARCH_SERVICE_BASE}/api/threads/author/{author}", timeout=5)
-		elif category:
-			resp = requests.get(f"{SEARCH_SERVICE_BASE}/api/threads/category/{category}", timeout=5)
+		# elif tag:
+		# 	resp = requests.get(f"{SEARCH_SERVICE_BASE}/api/threads/tag/{tag}", timeout=5)
+		elif thread_id:
+			resp = requests.get(f"{SEARCH_SERVICE_BASE}/api/threads/id/{thread_id}", timeout=5)
+		elif created_by:
+			resp = requests.get(f"{SEARCH_SERVICE_BASE}/api/threads/author/{created_by}", timeout=5)
+		elif status:
+			resp = requests.get(f"{SEARCH_SERVICE_BASE}/api/threads/status/{status}", timeout=5)
+		# elif category:
+		# 	resp = requests.get(f"{SEARCH_SERVICE_BASE}/api/threads/category/{category}", timeout=5)
 		elif start_date and end_date:
 			resp = requests.get(f"{SEARCH_SERVICE_BASE}/api/threads/daterange", params={"start_date": start_date, "end_date": end_date}, timeout=5)
-		elif channel_id:
-		
-			resp = requests.get(f"{SEARCH_SERVICE_BASE}/api/threads/id/{channel_id}", timeout=5)
+		# elif channel_id:
+		# 	resp = requests.get(f"{SEARCH_SERVICE_BASE}/api/threads/id/{channel_id}", timeout=5)
 		else:
 			# Si no hay filtros, retornar vacío
 			return []
