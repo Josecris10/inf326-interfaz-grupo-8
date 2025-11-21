@@ -10,6 +10,7 @@ export type Channel = {
 	id: string;
 	channel_type: ChannelType;
 	created_at: number;
+	deleted_at: number;
 	is_active: boolean;
 	name: string;
 	owner_id: string;

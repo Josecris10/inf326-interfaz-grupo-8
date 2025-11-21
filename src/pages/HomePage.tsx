@@ -345,7 +345,7 @@ export default function HomePage() {
 						</Box>
 					)}
 
-					{filteredChannels.map((channel) => (
+					{filteredChannels.filter((channel) => channel.deleted_at === null).map((channel) => (
 						<Box
 							key={channel.id}
 							bg="bg.surface"
