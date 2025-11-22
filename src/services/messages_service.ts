@@ -25,20 +25,20 @@ type DeleteMessageData = {
 };
 
 export interface CreateMessagePayload {
-	thread_id: number;
+	thread_id: string;
 	content: string;
 	type_: string;
 	paths: string[];
-	user_id: number;
+	user_id: string;
 }
 
 export interface UpdateMessagePayload {
-	thread_id: number;
-	message_id: number;
+	thread_id: string;
+	message_id: string;
 	content: string;
 	type_: string;
 	paths: string[];
-	user_id: number;
+	user_id: string;
 }
 
 // ===================================================================
@@ -46,7 +46,7 @@ export interface UpdateMessagePayload {
 // ===================================================================
 
 const GET_MESSAGE_QUERY = /* GraphQL */ `
-	query GetMessage($thread_id: Int!, $user_id: Int!) {
+	query GetMessage($thread_id: String!, $user_id: String!) {
 		getMessage(thread_id: $thread_id, user_id: $user_id) {
 			id
 			thread_id
@@ -62,11 +62,11 @@ const GET_MESSAGE_QUERY = /* GraphQL */ `
 
 const CREATE_MESSAGE_MUTATION = /* GraphQL */ `
 	mutation CreateMessage(
-		$thread_id: Int!
+		$thread_id: String!
 		$content: String!
 		$type_: String!
 		$paths: [String!]!
-		$user_id: Int!
+		$user_id: String!
 	) {
 		createMessage(
 			thread_id: $thread_id
@@ -89,12 +89,12 @@ const CREATE_MESSAGE_MUTATION = /* GraphQL */ `
 
 const UPDATE_MESSAGE_MUTATION = /* GraphQL */ `
 	mutation UpdateMessage(
-		$thread_id: Int!
-		$message_id: Int!
+		$thread_id: String!
+		$message_id: String!
 		$content: String!
 		$type_: String!
 		$paths: [String!]!
-		$user_id: Int!
+		$user_id: String!
 	) {
 		updateMessage(
 			thread_id: $thread_id
@@ -118,9 +118,9 @@ const UPDATE_MESSAGE_MUTATION = /* GraphQL */ `
 
 const DELETE_MESSAGE_MUTATION = /* GraphQL */ `
 	mutation DeleteMessage(
-		$thread_id: Int!
-		$message_id: Int!
-		$user_id: Int!
+		$thread_id: String!
+		$message_id: Int!String!
+		$user_id: String!
 	) {
 		deleteMessage(
 			thread_id: $thread_id

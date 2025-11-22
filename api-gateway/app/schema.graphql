@@ -215,7 +215,7 @@ type Query {
 }
 
 type Mutation {
-    createMessage(thread_id: ID!, content: String!, type_: String!, paths: [String], user_id: String!): Message!
+    createMessage(thread_id: String!, content: String!, type_: String!, paths: [String], user_id: String!): Message!
     updateMessage(thread_id: String!, message_id: String!, content: String!, type_: String!, paths: [String], user_id: String!): Message!
     deleteMessage(thread_id: String!, message_id: String!, user_id: String!): Boolean!
 
