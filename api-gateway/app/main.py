@@ -547,6 +547,8 @@ async def resolve_equation_calculo_chatbot(obj, resolve_info: GraphQLResolveInfo
 	if response.status_code == 200 or response.status_code == 201:
 		return response.json()
 
+	raise GraphQLError(f"Solve Equation failed: {response.text}")
+
 @query.field("solveIntegralCalculoChatbot")
 async def resolve_integral_calculo_chatbot(obj, resolve_info: GraphQLResolveInfo, query):
 	payload = dict(query=query)
@@ -555,6 +557,8 @@ async def resolve_integral_calculo_chatbot(obj, resolve_info: GraphQLResolveInfo
 	if response.status_code == 200 or response.status_code == 201:
 		return response.json()
 
+	raise GraphQLError(f"Solve Integral failed: {response.text}")
+
 @query.field("solveDifferentiateCalculoChatbot")
 async def resolve_differentiate_calculo_chatbot(obj, resolve_info: GraphQLResolveInfo, query):
 	payload = dict(query=query)
@@ -562,6 +566,8 @@ async def resolve_differentiate_calculo_chatbot(obj, resolve_info: GraphQLResolv
 	response = requests.post(base_calculo_chatbot_service_url+"/differentiate", json=payload)
 	if response.status_code == 200 or response.status_code == 201:
 		return response.json()
+
+	raise GraphQLError(f"Solve Differentiate failed: {response.text}")
 
 # ----------------------------------------------     PRESENCE-SERVICE   ------------------------------------------------------------
 

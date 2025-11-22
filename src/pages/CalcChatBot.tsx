@@ -14,9 +14,11 @@ import { FiSend } from "react-icons/fi";
 import { RiRobot3Line } from "react-icons/ri";
 import { useNavigate } from "react-router-dom";
 import type { ChatMessage } from "@/types/calc.chatbot";
+import { SolveEquationCalculoChatbotReply, SolveIntegralCalculoChatbotReply, SolveDifferentiateCalculoChatbotReply } from "@/services/calc_chatbot_service";
 
 export default function CalcChatBot() {
 	const navigate = useNavigate();
+	const [mode, setMode] = useState("ecuaciones"); 
 
 	const [messages, setMessages] = useState<ChatMessage[]>([
 		{
@@ -35,7 +37,7 @@ export default function CalcChatBot() {
 		}
 	}, [messages]);
 
-	const handleSend = () => {
+	const handleSend = async () => {
 		const text = input.trim();
 		if (!text) return;
 
@@ -47,14 +49,33 @@ export default function CalcChatBot() {
 
 		setMessages((prev) => [...prev, newMessage]);
 		setInput("");
+		let res = "";
 
+		try {
+			if (mode == "ecuaciones"){
+				const msgRes = await SolveEquationCalculoChatbotReply(text);
+				let aux = msgRes.solution
+				res = aux.toString();
+			} else if (mode == "integrales"){
+				const msgRes = await SolveIntegralCalculoChatbotReply(text);
+				res = msgRes.result;
+			} else {
+				const msgRes = await SolveDifferentiateCalculoChatbotReply(text);
+				res = msgRes.result;
+			}
+			
+		} catch (error) {
+			res = 'Ocurrió un error inesperado, intenta mas tarde';
+			console.log(error);
+		}
+		
 		setTimeout(() => {
 			setMessages((prev) => [
 				...prev,
 				{
 					id: Date.now() + 1,
 					sender: "bot",
-					content: `Interesante pregunta. "${text}"\nAún no estoy conectado al backend, pero pronto te responderé mejor 😄`,
+					content: res,
 				},
 			]);
 		}, 600);
@@ -84,6 +105,14 @@ export default function CalcChatBot() {
 					</Text>
 				</Stack>
 
+				<Text whiteSpace="pre-wrap">{mode}</Text>
+
+				<HStack mb={4} justify="center">
+					<Button onClick={() => setMode("ecuaciones")}>Ecuaciones</Button>
+					<Button onClick={() => setMode("derivadas")}>Derivadas</Button>
+					<Button onClick={() => setMode("integrales")}>Integrales</Button>
+				</HStack>
+				
 				<Button
 					variant="outline"
 					p={2}
