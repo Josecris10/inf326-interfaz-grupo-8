@@ -24,7 +24,7 @@ export default function CalcChatBot() {
 		{
 			id: 1,
 			sender: "bot",
-			content: "Hola 👋 Soy el Bot de Cálculo. Te ayudare a resolver tus problemas matemáticos.",
+			content: `Hola 👋 Soy el Bot de Cálculo. Te ayudo a resolver ecuaciones, derivadas e integrales. Arriba puedes elegir el tipo de operación que quieres resolver. Escribe únicamente la expresión matemática, sin texto adicional. Recuerda usar símbolos explícitos: 5*x + 10 en lugar de 5x + 10, y ** para potencias (por ejemplo, x**2). ¡Listo cuando quieras! 😊`,
 		},
 	]);
 
@@ -55,13 +55,13 @@ export default function CalcChatBot() {
 			if (mode == "ecuaciones"){
 				const msgRes = await SolveEquationCalculoChatbotReply(text);
 				let aux = msgRes.solution
-				res = aux.toString();
+				res = "Las raíces de tu ecuación son las siguientes: " + aux.toString();
 			} else if (mode == "integrales"){
 				const msgRes = await SolveIntegralCalculoChatbotReply(text);
-				res = msgRes.result;
+				res = "La integral de tu expresión es la siguiente: " + msgRes.result;
 			} else {
 				const msgRes = await SolveDifferentiateCalculoChatbotReply(text);
-				res = msgRes.result;
+				res = "La derivada de tu expresión es la siguiente: " + msgRes.result;
 			}
 			
 		} catch (error) {
@@ -105,12 +105,31 @@ export default function CalcChatBot() {
 					</Text>
 				</Stack>
 
-				<Text whiteSpace="pre-wrap">{mode}</Text>
-
 				<HStack mb={4} justify="center">
-					<Button onClick={() => setMode("ecuaciones")}>Ecuaciones</Button>
-					<Button onClick={() => setMode("derivadas")}>Derivadas</Button>
-					<Button onClick={() => setMode("integrales")}>Integrales</Button>
+					<select
+						value={mode}
+						onChange={(e) => setMode(e.target.value)}
+						style={{
+						padding: "10px 14px",
+						borderRadius: "12px",
+						border: "1px solid #bbb",
+						fontSize: "15px",
+						backgroundColor: "white",
+						boxShadow: "0 2px 6px rgba(0, 0, 0, 0.08)",
+						cursor: "pointer",
+						transition: "all 0.2s ease",
+						}}
+						onMouseOver={(e) => {
+						e.currentTarget.style.boxShadow = "0 3px 8px rgba(0, 0, 0, 0.12)";
+						}}
+						onMouseOut={(e) => {
+						e.currentTarget.style.boxShadow = "0 2px 6px rgba(0, 0, 0, 0.08)";
+						}}
+					>
+						<option value="ecuaciones">Ecuaciones</option>
+						<option value="derivadas">Derivadas</option>
+						<option value="integrales">Integrales</option>
+					</select>
 				</HStack>
 				
 				<Button
