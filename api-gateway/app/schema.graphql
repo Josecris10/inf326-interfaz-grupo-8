@@ -206,7 +206,7 @@ type Query {
     getMessageWikipediaChatbot(message: String!): WikipediaChatbotReply!
     solveEquationCalculoChatbot(query: String!): EquationCalculoChatbotReply!
     solveIntegralCalculoChatbot(query: String!): IntegralDifferentiateCalculoChatbotReply!
-    solveIntegralCalculoChatbot(query: String!): IntegralDifferentiateCalculoChatbotReply!
+    solveDifferentiateCalculoChatbot(query: String!): IntegralDifferentiateCalculoChatbotReply!
 
     getPresence(statusEnum: StatusEnum): GetPresenceReply!
     getPresenceStats: GetPresenceStatsReply!
