@@ -119,7 +119,7 @@ const UPDATE_MESSAGE_MUTATION = /* GraphQL */ `
 const DELETE_MESSAGE_MUTATION = /* GraphQL */ `
 	mutation DeleteMessage(
 		$thread_id: String!
-		$message_id: Int!String!
+		$message_id: String!
 		$user_id: String!
 	) {
 		deleteMessage(
@@ -133,8 +133,8 @@ const DELETE_MESSAGE_MUTATION = /* GraphQL */ `
 //============================== Funciones de Servicio ==============================
 
 export async function getMessagesByThread(
-	thread_id: number,
-	user_id: number
+	thread_id: string,
+	user_id: string
 ): Promise<Message[]> {
 	const data = await gqlQuery<GetMessageData>(
 		API_URL,
@@ -189,9 +189,9 @@ export async function updateMessage(
 }
 
 export async function deleteMessage(
-	thread_id: number,
-	message_id: number,
-	user_id: number
+	thread_id: string,
+	message_id: string,
+	user_id: string
 ): Promise<boolean> {
 	const data = await gqlQuery<DeleteMessageData>(
 		API_URL,
