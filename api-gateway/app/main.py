@@ -57,6 +57,7 @@ base_thread_service_urL = "http://threads-service:80/v1/"
 # CAMBIARSE A LA ADAPTACIÓN EN EL CLUSTER
 base_wikipedia_chatbot_service_url = "http://wikipedia-chatbot-134-199-176-197.nip.io/chat-wikipedia"
 base_presence_service_url = "http://presence-134-199-176-197.nip.io/api/v1.0.0"
+base_calculo_chatbot_service_url = "http://api.calculadora.svc.cluster.local:8000/api/v1"
 
 # @query.field("getPlayer")
 # def resolve_get_player(obj, resolve_info: GraphQLResolveInfo, id):
@@ -538,6 +539,29 @@ async def resolve_get_message_wikipedia_chatbot(obj, resolve_info: GraphQLResolv
 	if response.status_code == 200 or response.status_code == 201:
 		return response.json()
 
+@query.field("solveEquationCalculoChatbot")
+async def resolve_equation_calculo_chatbot(obj, resolve_info: GraphQLResolveInfo, query):
+	payload = dict(query=query)
+
+	response = requests.post(base_calculo_chatbot_service_url+"/solve", json=payload)
+	if response.status_code == 200 or response.status_code == 201:
+		return response.json()
+
+@query.field("solveIntegralCalculoChatbot")
+async def resolve_integral_calculo_chatbot(obj, resolve_info: GraphQLResolveInfo, query):
+	payload = dict(query=query)
+
+	response = requests.post(base_calculo_chatbot_service_url+"/integrate", json=payload)
+	if response.status_code == 200 or response.status_code == 201:
+		return response.json()
+
+@query.field("solveDifferentiateCalculoChatbot")
+async def resolve_differentiate_calculo_chatbot(obj, resolve_info: GraphQLResolveInfo, query):
+	payload = dict(query=query)
+
+	response = requests.post(base_calculo_chatbot_service_url+"/differentiate", json=payload)
+	if response.status_code == 200 or response.status_code == 201:
+		return response.json()
 
 # ----------------------------------------------     PRESENCE-SERVICE   ------------------------------------------------------------
 

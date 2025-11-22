@@ -93,6 +93,16 @@ type WikipediaChatbotReply {
     message: String!
 }
 
+type EquationCalculoChatbotReply {
+    query: String!
+    solution: [String!]!
+}
+
+type IntegralDifferentiateCalculoChatbotReply {
+    query: String!
+    operation: String!
+    result: String!
+}
 
 
 
@@ -194,6 +204,9 @@ type Query {
 
     getMessagePrograChatbot(message: String!): PrograChatbotReply!
     getMessageWikipediaChatbot(message: String!): WikipediaChatbotReply!
+    solveEquationCalculoChatbot(query: String!): EquationCalculoChatbotReply!
+    solveIntegralCalculoChatbot(query: String!): IntegralDifferentiateCalculoChatbotReply!
+    solveIntegralCalculoChatbot(query: String!): IntegralDifferentiateCalculoChatbotReply!
 
     getPresence(statusEnum: StatusEnum): GetPresenceReply!
     getPresenceStats: GetPresenceStatsReply!
