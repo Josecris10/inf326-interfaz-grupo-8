@@ -12,9 +12,10 @@ import {
 	NativeSelect,
 	Stack,
 	Text,
+	IconButton,
 } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
-import { FiSearch } from "react-icons/fi";
+import { FiMenu, FiX, FiSearch } from "react-icons/fi";
 import { FaBook } from "react-icons/fa";
 import { FaCalculator } from "react-icons/fa";
 import { FaLaptopCode } from "react-icons/fa";
@@ -25,8 +26,10 @@ import { searchChannel } from "../services/search_service";
 import type { Channel, ChannelType } from "../types/channel";
 import { createChannel } from "../services/channels_service";
 import { getUserID } from "@/services/storage";
+import { PresenceStatsCard } from "@/components/auth/Presence";
 
 export default function HomePage() {
+	const [menuOpen, setMenuOpen] = useState(false);
 	const [newName, setNewName] = useState("");
 	const [newType, setNewType] = useState<"public" | "private">("public");
 	const [isCreating, setIsCreating] = useState(false);
@@ -125,141 +128,122 @@ export default function HomePage() {
 				position="sticky"
 				top={0}
 				zIndex={10}
+				w="100%"
+				flexWrap="wrap"
 			>
+
+				{/* Izquierda */}
 				<HStack gap={2}>
-					<Heading size="4xl" color={"#fff"}>
+					<Heading size="4xl" color="#fff">
 						INF326 Community
 					</Heading>
 				</HStack>
 
-				<HStack flex="1" ml={8} gap={2} w="full">
-					<Input
-						placeholder="Buscar por palabra clave..."
-						value={search}
-						// Tipamos el evento 'e'
-						onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value)}
-						bg="bg.subtle"
-						flex="1"
-					/>
-
-					<Box width="160px">
-						<NativeSelect.Root variant="outline" size="md">
-							<NativeSelect.Field
-								bg="bg.subtle"
-								placeholder="Tipo: Todos"
-								value={channelType}
-								onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setChannelType(e.target.value)}
-							>
-								<option value="public">Público</option>
-								<option value="private">Privado</option>
-							</NativeSelect.Field>
-
-							<NativeSelect.Indicator />
-						</NativeSelect.Root>
-					</Box>
-
-					<Box width="160px">
-						<NativeSelect.Root variant="outline" size="md">
-							<NativeSelect.Field
-								bg="bg.subtle"
-								placeholder="Estado: Todos"
-								value={isActive}
-								onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setIsActive(e.target.value)}
-							>
-								<option value="true">Activo</option>
-								<option value="false">Inactivo</option>
-							</NativeSelect.Field>
-
-							<NativeSelect.Indicator />
-						</NativeSelect.Root>
-					</Box>
-
-					<Button
-						aria-label="Buscar"
-						variant={"outline"}
-						bg="#004B85"
-						color="white"
-						_hover={{ bg: "#003B65" }}
-						onClick={handleSearchClick}
-						px={3}
-					>
-						<FiSearch />
-					</Button>
-				</HStack>
-
-				<HStack maxW="sm" flex="1" ml={8} gap={2}>
-					<Button
-						aria-label="Academico"
-						variant="outline"
-						p={2}
-						bg="#004B85"
-						color="#fff"
-						onClick={() => navigate("/academic")}
-					>
-						<FaBook />
-					</Button>
-
-					<Button
-						aria-label="Calculadora"
-						variant="outline"
-						p={2}
-						bg="#004B85"
-						color="#fff"
-						onClick={() => navigate("/calculator")}
-					>
-						<FaCalculator />
-					</Button>
-
-					<Button
-						aria-label="Programacion"
-						variant="outline"
-						p={2}
-						bg="#004B85"
-						color="#fff"
-						onClick={() => navigate("/programation")}
-					>
-						<FaLaptopCode />
-					</Button>
-
-					<Button
-						aria-label="Utilidad"
-						variant="outline"
-						p={2}
-						bg="#004B85"
-						color="#fff"
-						onClick={() => navigate("/utility")}
-					>
-						<FaTools />
-					</Button>
-
-					<Button
-						aria-label="Wikipedia"
-						variant="outline"
-						p={2}
-						bg="#004B85"
-						color="#fff"
-						onClick={() => navigate("/wikipedia")}
-					>
-						<FaWikipediaW />
-					</Button>
-				</HStack>
-
+				{/* Botón menú (solo móvil) */}
 				<Button
-					aria-label="Cerrar Sesión"
-					variant="outline"
-					p={2}
-					bg="#D60019"
-					color="#fff"
-					_hover={{
-						bg: "#fff",
-						color: "#D60019",
-					}}
-					onClick={() => navigate("/login")}
+					display={{ base: "flex", md: "none" }}
+					onClick={() => setMenuOpen(!menuOpen)}
+					bg="#003B65"
+					color="white"
+					_hover={{ bg: "#002B55" }}
 				>
-					<Text fontSize={"lg"}>
-						Cerrar Sesión
-					</Text>
+					{menuOpen ? "Cerrar menú" : "Menú"}
 				</Button>
+
+				{/* CONTENIDO RESPONSIVE */}
+				<Flex
+					w="100%"
+					mt={4}
+					gap={4}
+					display={{ base: menuOpen ? "flex" : "none", md: "flex" }}
+					flexWrap="wrap"
+					align="center"
+					justify="space-between"
+				>
+					{/* Buscador + filtros */}
+					<Flex flex="1" gap={2} flexWrap="wrap">
+						<Input
+							placeholder="Buscar por palabra clave..."
+							value={search}
+							onChange={(e) => setSearch(e.target.value)}
+							bg="bg.subtle"
+							flex="1"
+							minW="200px"
+						/>
+
+						<Box minW="140px">
+							<NativeSelect.Root variant="outline" size="md">
+								<NativeSelect.Field
+									bg="bg.subtle"
+									value={channelType}
+									onChange={(e) => setChannelType(e.target.value)}
+								>
+									<option value="public">Público</option>
+									<option value="private">Privado</option>
+								</NativeSelect.Field>
+								<NativeSelect.Indicator />
+							</NativeSelect.Root>
+						</Box>
+
+						<Box minW="140px">
+							<NativeSelect.Root variant="outline" size="md">
+								<NativeSelect.Field
+									bg="bg.subtle"
+									value={isActive}
+									onChange={(e) => setIsActive(e.target.value)}
+								>
+									<option value="true">Activo</option>
+									<option value="false">Inactivo</option>
+								</NativeSelect.Field>
+								<NativeSelect.Indicator />
+							</NativeSelect.Root>
+						</Box>
+
+						<Button
+							variant="outline"
+							bg="#004B85"
+							color="white"
+							_hover={{ bg: "#003B65" }}
+							onClick={handleSearchClick}
+						>
+							<FiSearch />
+						</Button>
+					</Flex>
+
+					{/* Botones de navegación */}
+					<HStack gap={2} flexWrap="wrap">
+						<Button variant="outline" p={2} bg="#004B85" color="#fff" onClick={() => navigate("/academic")}>
+							<FaBook />
+						</Button>
+						<Button variant="outline" p={2} bg="#004B85" color="#fff" onClick={() => navigate("/calculator")}>
+							<FaCalculator />
+						</Button>
+						<Button variant="outline" p={2} bg="#004B85" color="#fff" onClick={() => navigate("/programation")}>
+							<FaLaptopCode />
+						</Button>
+						<Button variant="outline" p={2} bg="#004B85" color="#fff" onClick={() => navigate("/utility")}>
+							<FaTools />
+						</Button>
+						<Button variant="outline" p={2} bg="#004B85" color="#fff" onClick={() => navigate("/wikipedia")}>
+							<FaWikipediaW />
+						</Button>
+					</HStack>
+
+					{/* Stats */}
+					<PresenceStatsCard />
+
+					{/* Logout */}
+					<Button
+						variant="outline"
+						p={2}
+						bg="#D60019"
+						color="#fff"
+						_hover={{ bg: "#fff", color: "#D60019" }}
+						onClick={() => navigate("/login")}
+					>
+						<Text fontSize="lg">Cerrar Sesión</Text>
+					</Button>
+				</Flex>
 			</Flex>
 
 			<Container maxW="4xl" py={8}>
