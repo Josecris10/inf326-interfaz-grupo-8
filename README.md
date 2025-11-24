@@ -1,4 +1,4 @@
-# Tarea 7 Arquitectura de Software INF326
+# Tarea 6 Arquitectura de Software INF326
 Integrantes:
 - Jan Jorquera.
 - Jose Astudillo.
