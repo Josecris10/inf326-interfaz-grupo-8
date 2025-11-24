@@ -44,8 +44,16 @@ export default function HomePage() {
 
 	useEffect(() => {
 		async function fetchAll() {
+			const params: Record<string, string | number | boolean> = {};
+
+			params.q = "";
+			params.channel_type = "public";
+			params.is_active = true;
+			params.limit = 50;
+			params.offset = 0;
+			
 			try {
-				const all = await searchChannel(undefined);
+				const all = await searchChannel(params);
 				setFilteredChannels(all);
 			} catch (err) {
 				console.error("Error al cargar canales:", err);
