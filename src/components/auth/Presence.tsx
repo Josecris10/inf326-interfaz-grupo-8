@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { Box, Text, Flex, Badge, Spinner } from "@chakra-ui/react";
-import { getPresenceStats } from "../../services/presence_service"; // ajusta ruta
-import type { GetPresenceStatsReply } from "../types";
+import { getPresenceStats, type GetPresenceStatsReply } from "../../services/presence_service"; // ajusta ruta
 
 export const PresenceStatsCard = () => {
     const [stats, setStats] = useState<GetPresenceStatsReply | null>(null);

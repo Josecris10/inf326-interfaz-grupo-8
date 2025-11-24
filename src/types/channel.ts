@@ -10,10 +10,10 @@ export type Channel = {
 	id: string;
 	channel_type: ChannelType;
 	created_at: number;
-	deleted_at: number;
+	deleted_at: number | null;
 	is_active: boolean;
 	name: string;
 	owner_id: string;
-	updated_at: number;
+	updated_at: number | null;
 	users: ChannelMember[];
 };

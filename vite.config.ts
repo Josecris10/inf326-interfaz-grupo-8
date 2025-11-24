@@ -10,4 +10,17 @@ export default defineConfig({
       "@": path.resolve(__dirname, "src"),
     },
   },
+  server: {
+    host: "0.0.0.0",      // necesario para exponer fuera del container
+    port: 5173,           // puerto fijo
+    strictPort: true,
+    watch: {
+      usePolling: true,   // Vite + Docker necesitan polling para recargar
+    },
+    hmr: {
+      host: "localhost",  // si no, la UI no carga desde fuera del container
+      protocol: "ws",
+      port: 5173
+    }
+  }
 })

@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: grupo8-interfaz
+spec:
+  type: NodePort
+  selector:
+    app: grupo8-interfaz
+  ports:
+    - port: 80
+      targetPort: 80
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grupo8-interfaz
+spec:
+  selector:
+    matchLabels:
+      app: grupo8-interfaz
+  template:
+    metadata:
+      labels:
+        app: grupo8-interfaz
+    spec:
+      containers:
+      - name: grupo8-interfaz
+        image: janjorquera/interfaz:latest
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "500m"
+            memory: "256Mi"

@@ -12,10 +12,9 @@ import {
 	NativeSelect,
 	Stack,
 	Text,
-	IconButton,
 } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
-import { FiMenu, FiX, FiSearch } from "react-icons/fi";
+import { FiSearch } from "react-icons/fi";
 import { FaBook } from "react-icons/fa";
 import { FaCalculator } from "react-icons/fa";
 import { FaLaptopCode } from "react-icons/fa";

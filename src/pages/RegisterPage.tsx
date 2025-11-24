@@ -22,7 +22,7 @@ export default function RegisterPage() {
 	const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		try {
-			const Res = await createUser({
+			await createUser({
 				email,
 				username,
 				password,
