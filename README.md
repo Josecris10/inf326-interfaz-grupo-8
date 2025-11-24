@@ -1,73 +1,16 @@
-# React + TypeScript + Vite
+# Tarea 7 Arquitectura de Software INF326
+Integrantes:
+- Jan Jorquera.
+- Jose Astudillo.
+- Alessandro Cintolesi.
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+- Enlace al respositorio: ``https://github.com/Josecris10/inf326-interfaz-grupo-8``
+- Video Explicativo de la tarea: ``https://youtu.be/WRbSw60I8iw``
 
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
-
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## Observaciones:
+- Este repositorio incluye la interfaz desarrollada a partir de los microservicios disponibles en el cluster
+del curso, esta interfaz se encuentra disponible en el mismo cluster accediendo a la URL ``https://grupo8interfaz.inf326.nursoft.dev/``.
+- Tambien se incluye el apigateway correspondiente el cual se encuentra disponible en el cluster del curso accediendo a la URL ``https://grupo8apigateway.inf326.nursoft.dev/``.
+- Se utilizaron **mocks** en partes especificas debido a la falta de comunicación y/o retraso en la respuesta de los grupos responsables.
+- Fe de erratas: en el video se dice que no hubo conexión con el microservicio de moderación pero si la hubo, solo que no se evidencia debido a la ausencia de datos reales en el microservicio de mensajes.
+- Finalemnte en el apartado de búsqueda que se refleja tanto en el vídeo y que es parte de nuestro microservicio no funciona apropiadamente (se utilizaron mocks) debido a que algunos grupos como el servicio de hebras decidieron implementar sus propios messages-brokers y no conectarse al que fue provisto por nuestro grupo y que otros servicios si se conectaron hace alrededor de 1 mes, en un intento nuestro por unificar todo. Algunos de éstos equipos fueron contactados por privado, solicitandoles realizar esta unificación pero hicieron caso omiso.
