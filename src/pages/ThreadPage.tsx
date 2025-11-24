@@ -21,6 +21,8 @@ import { IoText } from "react-icons/io5";
 import { MOCK_MESSAGES } from "../data/mock_messages";
 import type { Channel } from "../types/channel";
 import type { Thread } from "../types/thread";
+import { createModerate } from "@/services/moderation_service";
+import type { Message } from "@/types/message";
 
 export default function ThreadPage() {
 	const [search, setSearch] = useState("");
@@ -68,6 +70,21 @@ export default function ThreadPage() {
 		});
 		setNewMessage("");
 	};
+
+	const onModerate = async (message: Message) => {
+		try {
+			const moderate = await createModerate(
+				message.id,
+				message.user_id,
+				channel.id,
+				message.content ?? ""
+			);
+			alert(`El reporte del mensaje fue realizado correctamente, severidad ${moderate.severity} detectada`);
+		} catch (err) {
+			console.log(err)
+			alert("Ocurrió un error al reportar el mensaje");
+		}
+	}
 
 	return (
 		<Box minW="100vh" bg="bg.subtle">
@@ -234,6 +251,17 @@ export default function ThreadPage() {
 								<Text fontSize="sm">
 									Última vez actualizado: {message.updated_at}
 								</Text>
+							</Flex>
+
+							{/* --- BOTÓN PARA MODERAR --- */}
+							<Flex mt={4} justify="flex-end">
+								<Button
+									colorScheme="blue"
+									size="sm"
+									onClick={() => onModerate(message)}
+								>
+									Moderar
+								</Button>
 							</Flex>
 						</Box>
 					))}

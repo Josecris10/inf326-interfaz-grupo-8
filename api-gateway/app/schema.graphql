@@ -191,6 +191,19 @@ type Thread {
 }
 
 
+type ModerateMessageResponse {
+    is_approved: Boolean!
+    action: String!
+    severity: String!
+    toxicity_score: Float!
+    strike_count: Int!
+    message: String!
+    detected_words: [String]
+    language: String
+    ban_info: JSON
+}
+
+
 type Query {
     getMessage(thread_id: String!, user_id: String!): MessagesPage!
 
@@ -236,10 +249,9 @@ type Mutation {
     registerPresence(userId: String!, device: DeviceEnum, ip: String): RegisterPresenceReply!
     updatePresence(userId: String!, status: StatusEnum, heartbeat: Boolean): UpdateDeletePresenceReply!
     deletePresence(userId: String!): UpdateDeletePresenceReply!
+
+    createModerate(message_id: String!, user_id: String!, channel_id: String!, content: String!): ModerateMessageResponse!
 }
-
-
-
 
 
 

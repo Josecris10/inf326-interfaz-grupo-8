@@ -838,6 +838,21 @@ def resolve_list_blacklist_words(obj, resolve_info: GraphQLResolveInfo,
 		logging.exception("listBlacklistWords error: %s", e)
 		return None
 	
+@mutation.field("createModerate")
+def resolve_create_moderate(obj, resolve_info: GraphQLResolveInfo, message_id, user_id, channel_id, content):
+	payload = dict(
+		message_id=message_id,
+		user_id=user_id,
+		channel_id=channel_id,
+		content=content
+	)
+	
+	response = requests.patch(base_presence_service_url+"/check", json=payload)
+
+	if response.status_code == 200 or response.status_code == 201:
+		return response.json()
+
+	raise GraphQLError(f"Moderation failed: {response.text}")
 
 schema = make_executable_schema(
 	type_defs,
